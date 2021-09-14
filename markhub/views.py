@@ -1,5 +1,7 @@
 from django.views.generic import TemplateView
 
+from github import Github
+
 
 class Home(TemplateView):
     template_name = 'home.html'
@@ -10,5 +12,6 @@ class Home(TemplateView):
         if social_account.exists() and social_account.first().provider == 'github':
             social_login = social_account.first().socialtoken_set
             if social_login.exists():
-                print(social_login.first().token)
+                g = Github(social_login.first().token)
+                context['repos'] = [repo.name for repo in g.get_user().get_repos()]
         return context
