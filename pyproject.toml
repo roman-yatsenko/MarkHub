@@ -10,6 +10,7 @@ python = "^3.8"
 Django = "~3.2"
 django-allauth = "~0.45"
 PyGithub = "~1.55"
+django-environ = "~0.7.0"
 
 [tool.poetry.dev-dependencies]
 
