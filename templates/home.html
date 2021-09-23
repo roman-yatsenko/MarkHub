@@ -1,14 +1,24 @@
+{% extends "base.html" %}
 {% load socialaccount %}
 
-<h1>Django Allauth Tutorial</h1>
-{% if user.is_authenticated %}
-<p>Welcome {{ user.username }} !!!</p>
-<p>Your repositories:</p>
-<ul>
-  {% for repo in repos %}
-  <li>{{ repo }}</li>
-  {% endfor %}
-</ul>
-{% else %}
-<a href="{% provider_login_url 'github' %}">Sign Up</a>
-{% endif %}
+
+{% block title %}
+  {% if user.is_authenticated %}
+    Repositories - 
+  {% endif %}
+{% endblock %}
+  
+  
+{% block content %}
+  {% if user.is_authenticated %}
+    <h2>Welcome {{ user.username }} !</h2>
+    <p>Your repositories:</p>
+    <ul>
+      {% for repo in repos %}
+      <li>{{ repo }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <a href="{% provider_login_url 'github' %}">Sign Up</a>
+  {% endif %}
+{% endblock %}
