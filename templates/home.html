@@ -15,7 +15,7 @@
     <p>Your repositories:</p>
     <ul>
       {% for repo in repos %}
-      <li>{{ repo }}</li>
+      <li><a href="{% url 'repo' repo %}">{{ repo }}</a></li>
       {% endfor %}
     </ul>
   {% else %}

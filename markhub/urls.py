@@ -16,10 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import Home
+from .views import HomeView, RepoView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('', Home.as_view(), name='home'),
+    path('repo/<slug:repo>/', RepoView.as_view(), name='repo'),
+    path('', HomeView.as_view(), name='home'),
 ]
