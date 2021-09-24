@@ -1,10 +1,20 @@
-from typing import Any, Dict
+from typing import Any, Dict, Union
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 
 from github import Github
 
-def get_github_handler(user):
+def get_github_handler(user: User) -> Union[Github, None]:
+    """Get github handler for user
+
+    Args:
+        user: User from request
+
+    Returns:
+        Github object for user if it has a token, otherwise None
+    """
+    
     social_account = user.socialaccount_set
     if social_account.exists() and social_account.first().provider == 'github':
         social_login = social_account.first().socialtoken_set
@@ -13,9 +23,13 @@ def get_github_handler(user):
 
 
 class HomeView(TemplateView):
+    """Home page view"""
+    
     template_name = 'home.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for home page view"""
+
         context = super().get_context_data(**kwargs)
         user = self.request.user
         if user.is_authenticated:
@@ -26,8 +40,12 @@ class HomeView(TemplateView):
 
 
 class RepoView(LoginRequiredMixin, TemplateView):
+    """Repository page view"""
+    
     template_name = 'repo.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for home page view"""
+
         context = super().get_context_data(**kwargs)
         return context
