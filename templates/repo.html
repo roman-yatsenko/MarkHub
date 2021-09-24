@@ -8,4 +8,9 @@
 
 {% block content %}
 <h2>{{ user.username }}/{{ repo }}</h2>
+<ul>
+  {% for file in repo_files %}
+    <li>{{ file }}</li>
+  {% endfor %}
+</ul>
 {% endblock %}
