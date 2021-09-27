@@ -21,6 +21,7 @@ from .views import HomeView, RepoView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
+    path('repo/<slug:repo>/<str:path>/', RepoView.as_view(), name='repo'),
     path('repo/<slug:repo>/', RepoView.as_view(), name='repo'),
     path('', HomeView.as_view(), name='home'),
 ]

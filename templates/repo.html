@@ -9,8 +9,12 @@
 {% block content %}
 <h2>{{ user.username }}/{{ repo }}</h2>
 <ul>
-  {% for file in repo_files %}
-    <li>{{ file }}</li>
+  {% for content in repo_contents %}
+    {% if content.type == "dir"%}
+      <li><a href ="{% url 'repo' repo content.path %}">{{ content.path }}</a></li>
+    {% else %}
+      <li>{{ content.path }}</li>
+    {% endif %}
   {% endfor %}
 </ul>
 {% endblock %}

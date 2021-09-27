@@ -48,12 +48,15 @@ class RepoView(LoginRequiredMixin, TemplateView):
         """Get context data for home page view"""
 
         context = super().get_context_data(**kwargs)
-        g: Github = get_github_handler(self.request.user)
+        user = self.request.user
+        path = context.get('path')
+        g: Github = get_github_handler(user)
         if g:
-            print(context['repo'])
-            repo = g.get_repo(context['repo'])
+            repo = g.get_repo(f"{user.username}/{context['repo']}")
             contents = repo.get_contents('')
-            context['repo_files'] = []
+            context['repo_contents'] = []
             while contents:
-                context['repo_files'].append(contents.pop(0).path)
+                content = contents.pop(0)
+                if not path or (content.path.startswith(path)):
+                    context['repo_contents'].append(content)
         return context
