@@ -53,10 +53,12 @@ class RepoView(LoginRequiredMixin, TemplateView):
         g: Github = get_github_handler(user)
         if g:
             repo = g.get_repo(f"{user.username}/{context['repo']}")
-            contents = repo.get_contents('')
-            context['repo_contents'] = []
-            while contents:
-                content = contents.pop(0)
-                if not path or (content.path.startswith(path)):
-                    context['repo_contents'].append(content)
+            if not path:
+                contents = repo.get_contents('')
+            else:
+                contents = repo.get_dir_contents(path)
+            if len(contents) > 0:
+                context['repo_contents'] = contents
+            elif contents:
+                context['repo_contents'] = [contents]
         return context
