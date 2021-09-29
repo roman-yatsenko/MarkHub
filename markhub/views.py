@@ -41,12 +41,12 @@ class HomeView(TemplateView):
 
 
 class RepoView(LoginRequiredMixin, TemplateView):
-    """Repository page view"""
+    """Repository view"""
     
     template_name = 'repo.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Get context data for home page view"""
+        """Get context data for repository view"""
 
         context = super().get_context_data(**kwargs)
         user = self.request.user
@@ -59,13 +59,30 @@ class RepoView(LoginRequiredMixin, TemplateView):
             else:
                 contents = repo.get_dir_contents(path)
                 path_parts = Path(path).parts
-                print(path_parts)
                 context['path_parts'] = {}
                 for i in range(len(path_parts)):
                     context['path_parts'][path_parts[i]] = '/'.join(path_parts[:i+1])
-                print(context['path_parts'])
             if len(contents) > 0:
                 context['repo_contents'] = contents
             elif contents:
                 context['repo_contents'] = [contents]
+        return context
+
+
+class FileView(LoginRequiredMixin, TemplateView):
+    """Repository file view"""
+
+    template_name = 'file.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for file view"""
+
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        path = context.get('path')
+        g: Github = get_github_handler(user)
+        if g:
+            repo = g.get_repo(f"{user.username}/{context['repo']}")
+            context['contents'] = repo.get_contents(path).content
+            print(context['contents'])
         return context
