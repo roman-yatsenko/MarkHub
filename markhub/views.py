@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 
+from pathlib import Path
 from github import Github
 
 def get_github_handler(user: User) -> Union[Github, None]:
@@ -57,6 +58,12 @@ class RepoView(LoginRequiredMixin, TemplateView):
                 contents = repo.get_contents('')
             else:
                 contents = repo.get_dir_contents(path)
+                path_parts = Path(path).parts
+                print(path_parts)
+                context['path_parts'] = {}
+                for i in range(len(path_parts)):
+                    context['path_parts'][path_parts[i]] = '/'.join(path_parts[:i+1])
+                print(context['path_parts'])
             if len(contents) > 0:
                 context['repo_contents'] = contents
             elif contents:
