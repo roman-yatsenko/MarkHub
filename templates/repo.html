@@ -21,7 +21,7 @@
     {% if content.type == "dir"%}
       <li><a href ="{% url 'repo' repo content.path %}">{{ content.name }}</a></li>
     {% else %}
-      <li>{{ content.name }}</li>
+      <li><a href ="{% url 'file' repo content.path %}">{{ content.name }}</a></li>
     {% endif %}
   {% endfor %}
 </ul>

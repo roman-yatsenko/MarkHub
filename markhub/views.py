@@ -83,6 +83,5 @@ class FileView(LoginRequiredMixin, TemplateView):
         g: Github = get_github_handler(user)
         if g:
             repo = g.get_repo(f"{user.username}/{context['repo']}")
-            context['contents'] = repo.get_contents(path).content
-            print(context['contents'])
+            context['contents'] = repo.get_contents(path).decoded_content.decode('UTF-8')
         return context
