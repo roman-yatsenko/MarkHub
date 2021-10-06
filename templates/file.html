@@ -10,9 +10,8 @@
 <h2>
   <a href ="{% url 'repo' repo %}">{{ repo }}</a>
   {% if path_parts %}
-     / 
     {% for key, value in path_parts.items %}
-      <a href ="{% url 'repo' repo value %}">{{ key }}</a> / 
+     / <a href ="{% url 'repo' repo value %}">{{ key }}</a>
     {% endfor %}  
   {% endif %}
 </h2>
