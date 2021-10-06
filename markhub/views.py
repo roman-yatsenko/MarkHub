@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, List
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -7,7 +7,7 @@ from pathlib import Path
 from github import Github
 
 def get_github_handler(user: User) -> Union[Github, None]:
-    """Get github handler for user
+    """ Get github handler for user
 
     Args:
         user: User from request
@@ -22,9 +22,25 @@ def get_github_handler(user: User) -> Union[Github, None]:
         if social_login.exists():
             return Github(social_login.first().token)    
 
+def get_path_parts(path: str) -> Dict:
+    """ Get path parts dict for path
+    
+    Args:
+        path: repository item path
+
+    Returns:
+        Path parts dict (dir: path to dir)
+    """
+
+    path_parts = Path(path).parts
+    path_parts_dict = {}
+    for i in range(len(path_parts)):
+        path_parts_dict[path_parts[i]] = '/'.join(path_parts[:i+1])
+    return path_parts_dict
+
 
 class HomeView(TemplateView):
-    """Home page view"""
+    """ Home page view """
     
     template_name = 'home.html'
 
@@ -41,7 +57,7 @@ class HomeView(TemplateView):
 
 
 class RepoView(LoginRequiredMixin, TemplateView):
-    """Repository view"""
+    """ Repository view """
     
     template_name = 'repo.html'
 
@@ -58,10 +74,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
                 contents = repo.get_contents('')
             else:
                 contents = repo.get_dir_contents(path)
-                path_parts = Path(path).parts
-                context['path_parts'] = {}
-                for i in range(len(path_parts)):
-                    context['path_parts'][path_parts[i]] = '/'.join(path_parts[:i+1])
+                context['path_parts'] = get_path_parts(path)
             if len(contents) > 0:
                 context['repo_contents'] = contents
             elif contents:
