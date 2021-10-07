@@ -1,10 +1,16 @@
 from typing import Any, Dict, Union, List
+from django.http.request import HttpRequest
+from django.http.response import HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from pathlib import Path
 from github import Github
+
+from .forms import NewFileForm
 
 def get_github_handler(user: User) -> Union[Github, None]:
     """ Get github handler for user
@@ -37,6 +43,26 @@ def get_path_parts(path: str) -> Dict:
     for i in range(len(path_parts)):
         path_parts_dict[path_parts[i]] = '/'.join(path_parts[:i+1])
     return path_parts_dict
+
+@login_required
+def new_file(request: HttpRequest) -> HttpResponse:
+    """ New File Controller
+    
+    Args:
+        request: request from form
+
+    Returns:
+        rendered page
+    """
+
+    if request.method == 'POST':
+        new_file_form = NewFileForm(request.POST)
+        if new_file_form.is_valid():
+            pass
+    else:
+        new_file_form = NewFileForm()
+    context = {'form': new_file_form}
+    return render(request, 'new_file.html', context)
 
 
 class HomeView(TemplateView):
