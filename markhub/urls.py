@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 
 from .views import HomeView, RepoView, FileView
+from .views import new_file_ctr
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('file/<slug:repo>/<path:path>/', FileView.as_view(), name='file'),
+    path('new-file/<slug:repo>/<path:path>/', new_file_ctr, name='new-file'),
     path('repo/<slug:repo>/<path:path>/', RepoView.as_view(), name='repo'),
     path('repo/<slug:repo>/', RepoView.as_view(), name='repo'),
     path('', HomeView.as_view(), name='home'),

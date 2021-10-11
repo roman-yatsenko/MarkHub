@@ -45,11 +45,13 @@ def get_path_parts(path: str) -> Dict:
     return path_parts_dict
 
 @login_required
-def new_file(request: HttpRequest) -> HttpResponse:
+def new_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     """ New File Controller
     
     Args:
         request: request from form
+        repo: repository name
+        path: repository path for the new file
 
     Returns:
         rendered page
@@ -98,6 +100,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
             repo = g.get_repo(f"{user.username}/{context['repo']}")
             if not path:
                 contents = repo.get_contents('')
+                context['path'] = ''
             else:
                 contents = repo.get_dir_contents(path)
                 context['path_parts'] = get_path_parts(path)
