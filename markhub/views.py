@@ -45,13 +45,13 @@ def get_path_parts(path: str) -> Dict:
     return path_parts_dict
 
 @login_required
-def new_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
+def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:
     """ New File Controller
     
     Args:
         request: request from form
         repo: repository name
-        path: repository path for the new file
+        path: repository path (empty str for root) for the new file
 
     Returns:
         rendered page

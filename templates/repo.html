@@ -14,7 +14,6 @@
       <a href ="{% url 'repo' repo value %}">{{ key }}</a> / 
     {% endfor %}  
   {% endif %}
-  <a href="{% url 'new-file' repo path %}">New file</a>
 </h2>
 <ul>
   {% for content in repo_contents %}
@@ -25,4 +24,11 @@
     {% endif %}
   {% endfor %}
 </ul>
+<p>
+  {% if path %}
+    <a href="{% url 'new-file' repo path %}">New file</a>
+  {% else %}
+    <a href="{% url 'new-file' repo %}">New file</a>
+  {% endif %}
+</p>
 {% endblock %}

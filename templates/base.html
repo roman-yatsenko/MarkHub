@@ -14,7 +14,9 @@
   {% block content %}
   {% endblock %}
   {% if user.is_authenticated %}
-    <a href="{% url 'account_logout' %}">Sign Out</a>
+    <p>
+      <a href="{% url 'account_logout' %}">Sign Out</a>
+    </p>
   {% endif %}
 </body>
 </html>
