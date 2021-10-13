@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from pathlib import Path
-from github import Github
+from github import Github, Repository
 
 from .forms import NewFileForm
 
@@ -27,6 +27,9 @@ def get_github_handler(user: User) -> Union[Github, None]:
         social_login = social_account.first().socialtoken_set
         if social_login.exists():
             return Github(social_login.first().token)    
+
+def get_user_repo(user: User, repo: str) -> Union[Repository, None]:
+    pass
 
 def get_path_parts(path: str) -> Dict:
     """ Get path parts dict for path
@@ -60,7 +63,11 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
-            pass
+            user = request.user
+            g: Github = get_github_handler(user)
+            if g:
+                repo = g.get_repo(f"{user.username}/{context['repo']}")
+                if not path:
     else:
         new_file_form = NewFileForm()
     context = {'form': new_file_form}
