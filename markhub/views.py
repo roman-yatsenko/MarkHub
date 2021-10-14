@@ -8,7 +8,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from pathlib import Path
-from github import Github, Repository
+from github import Github
+from github.Repository import Repository
 
 from .forms import NewFileForm
 
@@ -16,7 +17,7 @@ def get_github_handler(user: User) -> Union[Github, None]:
     """ Get github handler for user
 
     Args:
-        user: User from request
+        user: Django User
 
     Returns:
         Github object for user if it has a token, otherwise None
@@ -29,7 +30,20 @@ def get_github_handler(user: User) -> Union[Github, None]:
             return Github(social_login.first().token)    
 
 def get_user_repo(user: User, repo: str) -> Union[Repository, None]:
-    pass
+    """ Get user repo
+    
+    Args: 
+        user: Django User
+        repo: Repository name
+
+    Returns: 
+        Repository object if it exists, otherwise None
+    """
+    g: Github = get_github_handler(user)
+    if g:
+        repo = g.get_repo(f"{user.username}/{repo}")
+        if repo:
+            return repo
 
 def get_path_parts(path: str) -> Dict:
     """ Get path parts dict for path
@@ -60,17 +74,19 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         rendered page
     """
 
+    context = {}
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
-            user = request.user
-            g: Github = get_github_handler(user)
-            if g:
-                repo = g.get_repo(f"{user.username}/{context['repo']}")
-                if not path:
+            repository = get_user_repo(request.user, repo)
+            if repository:
+                repository.create_file(path + "new_file_test.txt", "test", "test", branch="master")
+                context['repo'] = repo
+                context['path'] = path
+                return render(request, 'repo.html', context)
     else:
         new_file_form = NewFileForm()
-    context = {'form': new_file_form}
+    context['form'] = new_file_form
     return render(request, 'new_file.html', context)
 
 
@@ -100,11 +116,9 @@ class RepoView(LoginRequiredMixin, TemplateView):
         """Get context data for repository view"""
 
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         path = context.get('path')
-        g: Github = get_github_handler(user)
-        if g:
-            repo = g.get_repo(f"{user.username}/{context['repo']}")
+        repo = get_user_repo(self.request.user, context['repo'])
+        if repo:
             if not path:
                 contents = repo.get_contents('')
                 context['path'] = ''
@@ -127,11 +141,9 @@ class FileView(LoginRequiredMixin, TemplateView):
         """Get context data for file view"""
 
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         path = context.get('path')
-        g: Github = get_github_handler(user)
-        if g:
-            repo = g.get_repo(f"{user.username}/{context['repo']}")
+        repo = get_user_repo(self.request.user, context['repo'])
+        if repo:
             context['path_parts'] = get_path_parts(path)
             context['contents'] = repo.get_contents(path).decoded_content.decode('UTF-8')
         return context
