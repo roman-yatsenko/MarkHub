@@ -74,19 +74,20 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         rendered page
     """
 
-    context = {}
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
             repository = get_user_repo(request.user, repo)
             if repository:
-                repository.create_file(path + "new_file_test.txt", "test", "test", branch="master")
-                context['repo'] = repo
-                context['path'] = path
-                return render(request, 'repo.html', context)
+                repository.create_file(
+                    path=path + new_file_form.cleaned_data['filename'], 
+                    message=f"Add {new_file_form.cleaned_data['filename']} at MarkHub", 
+                    content=new_file_form.cleaned_data['content'], 
+                    branch="master")
+                return RepoView.as_view()(request, repo=repo, path=path)
     else:
         new_file_form = NewFileForm()
-    context['form'] = new_file_form
+    context = {'form': new_file_form}
     return render(request, 'new_file.html', context)
 
 
