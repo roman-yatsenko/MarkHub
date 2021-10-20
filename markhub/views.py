@@ -79,11 +79,13 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         if new_file_form.is_valid():
             repository = get_user_repo(request.user, repo)
             if repository:
+                newfile_path = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}' 
                 repository.create_file(
-                    path=path + new_file_form.cleaned_data['filename'], 
+                    path=newfile_path, 
                     message=f"Add {new_file_form.cleaned_data['filename']} at MarkHub", 
                     content=new_file_form.cleaned_data['content'], 
-                    branch="master")
+                    branch=repository.default_branch)
+                request.method = 'GET'
                 return RepoView.as_view()(request, repo=repo, path=path)
     else:
         new_file_form = NewFileForm()
@@ -126,7 +128,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
             else:
                 contents = repo.get_dir_contents(path)
                 context['path_parts'] = get_path_parts(path)
-            if len(contents) > 0:
+            if isinstance(contents, list):
                 context['repo_contents'] = contents
             elif contents:
                 context['repo_contents'] = [contents]
