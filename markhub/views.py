@@ -132,6 +132,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
                 context['repo_contents'] = contents
             elif contents:
                 context['repo_contents'] = [contents]
+            context['branch'] = repo.default_branch
         return context
 
 
@@ -148,5 +149,6 @@ class FileView(LoginRequiredMixin, TemplateView):
         repo = get_user_repo(self.request.user, context['repo'])
         if repo:
             context['path_parts'] = get_path_parts(path)
+            context['branch'] = repo.default_branch
             context['contents'] = repo.get_contents(path).decoded_content.decode('UTF-8')
         return context
