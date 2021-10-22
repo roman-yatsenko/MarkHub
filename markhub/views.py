@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, Union
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.generic import TemplateView
@@ -6,12 +6,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 
 from pathlib import Path
 from github import Github
 from github.Repository import Repository
 
-from .forms import NewFileForm
+from .forms import EditFileForm
 
 def get_github_handler(user: User) -> Union[Github, None]:
     """ Get github handler for user
@@ -75,7 +76,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     """
 
     if request.method == 'POST':
-        new_file_form = NewFileForm(request.POST)
+        new_file_form = EditFileForm(request.POST)
         if new_file_form.is_valid():
             repository = get_user_repo(request.user, repo)
             if repository:
@@ -88,9 +89,47 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
                 request.method = 'GET'
                 return RepoView.as_view()(request, repo=repo, path=path)
     else:
-        new_file_form = NewFileForm()
+        new_file_form = EditFileForm()
     context = {'form': new_file_form}
-    return render(request, 'new_file.html', context)
+    context = {'title': 'New file in'}
+    return render(request, 'edit_file.html', context)
+
+@login_required
+def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
+    """ Update File Controller
+    
+    Args:
+        request: request from form
+        repo: repository name
+        path: repository file path
+
+    Returns:
+        rendered page
+    """
+
+    repository = get_user_repo(request.user, repo)
+    if repository:
+        context = {'title': 'Update file'}
+        contents = repository.get_contents(path)
+        if request.method == 'POST':
+            update_file_form = EditFileForm(request.POST)
+            if update_file_form.is_valid():
+                    repository.update_file(
+                        path=path, 
+                        message=f"Update {Path(path).name} at MarkHub", 
+                        content=update_file_form.cleaned_data['content'])
+                    request.method = 'GET'
+                    return RepoView.as_view()(request, repo=repo, path=Path(path).parent)
+        else:
+            data = {
+                'filename': path,
+                'content': contents.decoded_content.decode('UTF-8'),
+            }
+            update_file_form = EditFileForm(data)
+        context = {'form': update_file_form}
+        return render(request, 'edit_file.html', context)
+    else:
+        raise Http404("Repository not found")
 
 
 class HomeView(TemplateView):
