@@ -2,7 +2,7 @@
 
 {% block title %}
   {% if user.is_authenticated %}
-    New file in {{ path }} - 
+    {{ title }} {{ path }} - 
   {% endif %}
 {% endblock %}
 
@@ -10,6 +10,10 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Create">
+    {% if update %}
+      <input type="submit" value="Update">
+    {% else %}
+      <input type="submit" value="Create">
+    {% endif %}
   </form>
 {% endblock %}

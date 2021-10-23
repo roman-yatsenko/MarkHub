@@ -16,6 +16,9 @@
   {% endif %}
 </h2>
 <p>Branch: <i>{{ branch }}</i></p>
+<p>
+  <a href="{% url 'update-file' repo path %}">Update file</a>
+</p>
 {% if contents %}
 <pre>
 {{ contents }}
