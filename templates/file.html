@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}
   {% if user.is_authenticated %}
     {{ path }} - 
   {% endif %}
+{% endblock %}
+
+{% block add-to-head %}
+  <link rel="stylesheet" href="{% static 'css/delete-modal.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -17,11 +23,25 @@
 </h2>
 <p>Branch: <i>{{ branch }}</i></p>
 <p>
-  <a href="{% url 'update-file' repo path %}">Update file</a>
+  <a href="{% url 'update-file' repo path %}">Update file</a> 
+  <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 
 </p>
 {% if contents %}
 <pre>
 {{ contents }}
 </pre>
 {% endif %}
+<div id="delete-modal" class="modal">
+  <span onclick="document.getElementById('delete-modal').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <form class="modal-content" action="/">
+    <div class="container">
+      <h1>Delete File</h1>
+      <p>Are you sure you want to delete <em>{{ path }}</em> ?</p>
+      <div class="clearfix">
+        <button type="button" class="cancelbtn">Cancel</button>
+        <button type="button" class="deletebtn">Delete</button>
+      </div>
+    </div>
+  </form>
+</div>
 {% endblock %}
