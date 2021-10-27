@@ -139,6 +139,23 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     else:
         raise Http404("Repository not found")
 
+@login_required
+def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
+    """ Delete File Controller
+    
+    Args:
+        request: request from form
+        repo: repository name
+        path: repository file path
+
+    Returns:
+        rendered page
+    """
+
+    repository = get_user_repo(request.user, repo)
+    if repository:
+        contents = repository.get_contents(path)
+        repository.delete_file(contents.path, f"Delete {Path(path).name} at MarkHub", contents.sha)
 
 class HomeView(TemplateView):
     """ Home page view """
