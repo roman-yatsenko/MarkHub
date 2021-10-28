@@ -40,7 +40,7 @@
       <p>Are you sure you want to delete <em>{{ path }}</em> ?</p>
       <div class="clearfix">
         <button type="button" class="cancelbtn" onclick="deleteModal.style.display='none'">Cancel</button>
-        <button type="button" class="deletebtn">Delete</button>
+        <button type="button" class="deletebtn" onclick="location.href='{% url 'delete-file' repo path %}'">Delete</button>
       </div>
     </div>
   </form>

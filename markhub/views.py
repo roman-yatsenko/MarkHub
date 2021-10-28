@@ -154,8 +154,14 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
 
     repository = get_user_repo(request.user, repo)
     if repository:
+        path_object = PurePosixPath(path)
+        parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
         contents = repository.get_contents(path)
-        repository.delete_file(contents.path, f"Delete {Path(path).name} at MarkHub", contents.sha)
+        repository.delete_file(contents.path, f"Delete {path_object.name} at MarkHub", contents.sha)
+        return RepoView.as_view()(request, repo=repo, path=parent_path)
+    else:
+        raise Http404("Repository not found")
+
 
 class HomeView(TemplateView):
     """ Home page view """
