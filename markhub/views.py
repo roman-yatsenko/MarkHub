@@ -203,6 +203,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
             elif contents:
                 context['repo_contents'] = [contents]
             context['branch'] = repo.default_branch
+            context['html_url'] = f'{repo.html_url}/tree/{repo.default_branch}/{path if path else ""}'
         return context
 
 
@@ -220,5 +221,7 @@ class FileView(LoginRequiredMixin, TemplateView):
         if repo:
             context['path_parts'] = get_path_parts(path)
             context['branch'] = repo.default_branch
-            context['contents'] = repo.get_contents(path).decoded_content.decode('UTF-8')
+            contents = repo.get_contents(path)
+            context['contents'] = contents.decoded_content.decode('UTF-8')
+            context['html_url'] = contents.html_url
         return context
