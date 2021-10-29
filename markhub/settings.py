@@ -69,6 +69,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'markhub.urls'
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serilizers.PickleSerializer'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

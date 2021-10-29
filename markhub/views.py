@@ -1,4 +1,5 @@
 from typing import Any, Dict, Union
+import pickle
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.generic import TemplateView
@@ -45,6 +46,30 @@ def get_user_repo(user: User, repo: str) -> Union[Repository, None]:
         repo = g.get_repo(f"{user.username}/{repo}")
         if repo:
             return repo
+
+def get_session_repo(request: HttpRequest, repo: str) -> Union[Repository, None]:
+    """ Get Repository object for repo from session or via GitHub request
+    
+    Args: 
+        request: Django request object
+        repo: Repository name
+
+    Returns: 
+        Repository object if it exists, otherwise None
+    """
+
+    if 'repos' in request.session and \
+        repo in request.session['repos']:
+        return pickle.loads(request.session['repos'][repo])
+    else:
+        g: Github = get_github_handler(user)
+        if g:
+            repository = g.get_repo(f"{user.username}/{repo}")
+            if repository:
+                if 'repos' not in request.session:
+                    request.session['repos'] = dict()
+                request.session['repos'][repo] = pickle.dumps(repository)
+                return repository
 
 def get_path_parts(path: str) -> Dict:
     """ Get path parts dict for path
