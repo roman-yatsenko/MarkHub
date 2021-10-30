@@ -1,5 +1,5 @@
 from typing import Any, Dict, Union
-import pickle
+# import pickle
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.generic import TemplateView
@@ -55,21 +55,21 @@ def get_session_repo(request: HttpRequest, repo: str) -> Union[Repository, None]
         repo: Repository name
 
     Returns: 
-        Repository object if it exists, otherwise None
+        Repository object cached in session or via GitHub request, otherwise None
     """
 
-    if 'repos' in request.session and \
-        repo in request.session['repos']:
-        return pickle.loads(request.session['repos'][repo])
+    if repo in request.session :
+        return request.session[repo]
+        # return pickle.loads(request.session[repo])
     else:
         #TODO: get user
+        user = request.user
         g: Github = get_github_handler(user)
         if g:
             repository = g.get_repo(f"{user.username}/{repo}")
             if repository:
-                if 'repos' not in request.session:
-                    request.session['repos'] = dict()
-                request.session['repos'][repo] = pickle.dumps(repository)
+                request.session[repo] = repository
+                # request.session[repo] = pickle.dumps(repository)
                 return repository
 
 def get_path_parts(path: str) -> Dict:
@@ -104,7 +104,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
-            repository = get_user_repo(request.user, repo)
+            repository = get_session_repo(request, repo)
             if repository:
                 newfile_path = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}' 
                 repository.create_file(
@@ -135,7 +135,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
 
-    repository = get_user_repo(request.user, repo)
+    repository = get_session_repo(request, repo)
     if repository:
         context = {
             'update': True,
@@ -178,7 +178,7 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
 
-    repository = get_user_repo(request.user, repo)
+    repository = get_session_repo(request, repo)
     if repository:
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
@@ -216,7 +216,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         path = context.get('path')
-        repo = get_user_repo(self.request.user, context['repo'])
+        repo = get_session_repo(self.request, context['repo'])
         if repo:
             if not path:
                 contents = repo.get_contents('')
@@ -243,7 +243,7 @@ class FileView(LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         path = context.get('path')
-        repo = get_user_repo(self.request.user, context['repo'])
+        repo = get_session_repo(self.request, context['repo'])
         if repo:
             context['path_parts'] = get_path_parts(path)
             context['branch'] = repo.default_branch
