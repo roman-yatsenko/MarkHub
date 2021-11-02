@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 
 from .views import HomeView, RepoView, FileView
 from .views import new_file_ctr, update_file_ctr, delete_file_ctr
@@ -27,7 +27,7 @@ urlpatterns = [
     path('new-file/<slug:repo>/<path:path>/', new_file_ctr, name='new-file'),
     path('new-file/<slug:repo>/', new_file_ctr, name='new-file'),
     path('repo/<slug:repo>/<path:path>/', RepoView.as_view(), name='repo'),
-    path('repo/<slug:repo>/', RepoView.as_view(), name='repo'),
+    re_path(r'repo/(?P<repo>[-a-zA-Z0-9_/.]+)/$', RepoView.as_view(), name='repo'),
     path('update-file/<slug:repo>/<path:path>/', update_file_ctr, name='update-file'),
     path('', HomeView.as_view(), name='home'),
 ]
