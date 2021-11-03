@@ -5,12 +5,13 @@ from django.http.response import HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from pathlib import Path, PurePosixPath
 from github import Github
+from github.ContentFile import ContentFile
 from github.Repository import Repository
 
 from .forms import NewFileForm, UpdateFileForm
@@ -224,9 +225,11 @@ class RepoView(LoginRequiredMixin, TemplateView):
             else:
                 contents = repo.get_dir_contents(path)
                 context['path_parts'] = get_path_parts(path)
+            print(type(contents))
             if isinstance(contents, list):
                 context['repo_contents'] = contents
-            elif contents:
+            elif isinstance(contents, ContentFile):
+                # return redirect
                 context['repo_contents'] = [contents]
             context['branch'] = repo.default_branch
             context['html_url'] = f'{repo.html_url}/tree/{repo.default_branch}/{path if path else ""}'
