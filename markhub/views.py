@@ -10,6 +10,7 @@ from django.http import Http404
 
 from pathlib import Path, PurePosixPath
 from github import Github
+from github.ContentFile import ContentFile
 from github.Repository import Repository
 
 from .forms import NewFileForm, UpdateFileForm
@@ -46,6 +47,28 @@ def get_user_repo(user: User, repo: str) -> Union[Repository, None]:
         if repo:
             return repo
 
+def get_session_repo(request: HttpRequest, repo: str) -> Union[Repository, None]:
+    """ Get Repository object for repo from session or via GitHub request
+    
+    Args: 
+        request: Django request object
+        repo: Repository name
+
+    Returns: 
+        Repository object cached in session or via GitHub request, otherwise None
+    """
+
+    if repo in request.session :
+        return request.session[repo]
+    else:
+        user = request.user
+        g: Github = get_github_handler(user)
+        if g:
+            repository = g.get_repo(f"{user.username}/{repo}")
+            if repository:
+                request.session[repo] = repository
+                return repository
+
 def get_path_parts(path: str) -> Dict:
     """ Get path parts dict for path
     
@@ -78,7 +101,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
-            repository = get_user_repo(request.user, repo)
+            repository = get_session_repo(request, repo)
             if repository:
                 newfile_path = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}' 
                 repository.create_file(
@@ -109,7 +132,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
 
-    repository = get_user_repo(request.user, repo)
+    repository = get_session_repo(request, repo)
     if repository:
         context = {
             'update': True,
@@ -152,7 +175,7 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
 
-    repository = get_user_repo(request.user, repo)
+    repository = get_session_repo(request, repo)
     if repository:
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
@@ -190,7 +213,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         path = context.get('path')
-        repo = get_user_repo(self.request.user, context['repo'])
+        repo = get_session_repo(self.request, context['repo'])
         if repo:
             if not path:
                 contents = repo.get_contents('')
@@ -200,6 +223,9 @@ class RepoView(LoginRequiredMixin, TemplateView):
                 context['path_parts'] = get_path_parts(path)
             if isinstance(contents, list):
                 context['repo_contents'] = contents
+                contents.sort(
+                    key=lambda item: item.type + item.name
+                )
             elif contents:
                 context['repo_contents'] = [contents]
             context['branch'] = repo.default_branch
@@ -217,7 +243,7 @@ class FileView(LoginRequiredMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         path = context.get('path')
-        repo = get_user_repo(self.request.user, context['repo'])
+        repo = get_session_repo(self.request, context['repo'])
         if repo:
             context['path_parts'] = get_path_parts(path)
             context['branch'] = repo.default_branch
