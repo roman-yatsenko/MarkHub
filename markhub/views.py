@@ -1,11 +1,10 @@
 from typing import Any, Dict, Union
-# import pickle
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
@@ -61,16 +60,13 @@ def get_session_repo(request: HttpRequest, repo: str) -> Union[Repository, None]
 
     if repo in request.session :
         return request.session[repo]
-        # return pickle.loads(request.session[repo])
     else:
-        #TODO: get user
         user = request.user
         g: Github = get_github_handler(user)
         if g:
             repository = g.get_repo(f"{user.username}/{repo}")
             if repository:
                 request.session[repo] = repository
-                # request.session[repo] = pickle.dumps(repository)
                 return repository
 
 def get_path_parts(path: str) -> Dict:
@@ -225,11 +221,12 @@ class RepoView(LoginRequiredMixin, TemplateView):
             else:
                 contents = repo.get_dir_contents(path)
                 context['path_parts'] = get_path_parts(path)
-            print(type(contents))
             if isinstance(contents, list):
                 context['repo_contents'] = contents
-            elif isinstance(contents, ContentFile):
-                # return redirect
+                contents.sort(
+                    key=lambda item: item.type + item.name
+                )
+            elif contents:
                 context['repo_contents'] = [contents]
             context['branch'] = repo.default_branch
             context['html_url'] = f'{repo.html_url}/tree/{repo.default_branch}/{path if path else ""}'
