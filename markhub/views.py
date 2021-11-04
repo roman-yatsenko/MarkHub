@@ -215,11 +215,13 @@ class RepoView(LoginRequiredMixin, TemplateView):
         path = context.get('path')
         repo = get_session_repo(self.request, context['repo'])
         if repo:
+            if 'branch' not in context:
+                context['branch'] = repo.default_branch
             if not path:
-                contents = repo.get_contents('')
+                contents = repo.get_contents('', context['branch'])
                 context['path'] = ''
             else:
-                contents = repo.get_dir_contents(path)
+                contents = repo.get_dir_contents(path, context['branch'])
                 context['path_parts'] = get_path_parts(path)
             if isinstance(contents, list):
                 context['repo_contents'] = contents
@@ -228,8 +230,7 @@ class RepoView(LoginRequiredMixin, TemplateView):
                 )
             elif contents:
                 context['repo_contents'] = [contents]
-            context['branch'] = repo.default_branch
-            context['html_url'] = f'{repo.html_url}/tree/{repo.default_branch}/{path if path else ""}'
+            context['html_url'] = f'{repo.html_url}/tree/{context["branch"]}/{path if path else ""}'
         return context
 
 

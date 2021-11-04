@@ -8,22 +8,22 @@
 
 {% block content %}
 <h2>
+  <i>{{ branch }}</i>: 
   <a href ="{% url 'repo' repo %}">{{ repo }}</a> / 
   {% if path_parts %}
     {% for key, value in path_parts.items %}
       {% if not forloop.last %}
-        <a href ="{% url 'repo' repo value %}">{{ key }}</a> / 
+        <a href ="{% url 'repo' repo branch value %}">{{ key }}</a> / 
       {% else %}
         {{ key }}
       {% endif %}
     {% endfor %}  
   {% endif %}
 </h2>
-<p>Branch: <i>{{ branch }}</i></p>
 <ul>
   {% for content in repo_contents %}
     {% if content.type == "dir"%}
-      <li>📁 <a href ="{% url 'repo' repo content.path %}">{{ content.name }}</a></li>
+      <li>📁 <a href ="{% url 'repo' repo branch content.path %}">{{ content.name }}</a></li>
     {% else %}
       <li>📄 <a href ="{% url 'file' repo content.path %}">{{ content.name }}</a></li>
     {% endif %}
