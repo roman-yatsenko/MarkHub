@@ -18,7 +18,7 @@
   {% if path_parts %}
     {% for key, value in path_parts.items %}
       {% if not forloop.last %}
-        <a href ="{% url 'repo' repo value %}">{{ key }}</a> / 
+        <a href ="{% url 'repo' repo branch value %}">{{ key }}</a> / 
       {% else %}
         {{ key }}
       {% endif %}

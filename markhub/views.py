@@ -247,8 +247,9 @@ class FileView(LoginRequiredMixin, TemplateView):
         repo = get_session_repo(self.request, context['repo'])
         if repo:
             context['path_parts'] = get_path_parts(path)
-            context['branch'] = repo.default_branch
-            contents = repo.get_contents(path)
+            if 'branch' not in context:
+                context['branch'] = repo.default_branch
+            contents = repo.get_contents(path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
             context['html_url'] = contents.html_url
         return context

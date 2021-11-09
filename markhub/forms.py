@@ -14,3 +14,10 @@ class UpdateFileForm(forms.Form):
     filename = forms.CharField(max_length=256, label='File name', required=True, 
                                widget=forms.TextInput(attrs={'readonly':'readonly'}))
     content = forms.CharField(widget=forms.Textarea, label='File content')
+
+
+class BranchSelector(forms.Form):
+    """ Barnch Selector Form"""
+
+    branch = forms.ChoiceField(required=True)
+    
