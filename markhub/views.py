@@ -1,4 +1,5 @@
 from typing import Any, Dict, Union
+from django.http import request
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.views.generic import TemplateView
@@ -13,7 +14,7 @@ from github import Github
 from github.ContentFile import ContentFile
 from github.Repository import Repository
 
-from .forms import NewFileForm, UpdateFileForm
+from .forms import NewFileForm, UpdateFileForm, BranchSelector
 
 def get_github_handler(user: User) -> Union[Github, None]:
     """ Get github handler for user
@@ -67,7 +68,9 @@ def get_session_repo(request: HttpRequest, repo: str) -> Union[Repository, None]
             repository = g.get_repo(f"{user.username}/{repo}")
             if repository:
                 request.session[repo] = repository
+                request.session[f'{repo}__branches'] = [branch.name for branch in repository.get_branches()]
                 return repository
+    request.session['__current_repo__'] = repo
 
 def get_path_parts(path: str) -> Dict:
     """ Get path parts dict for path
@@ -217,6 +220,11 @@ class RepoView(LoginRequiredMixin, TemplateView):
         if repo:
             if 'branch' not in context:
                 context['branch'] = repo.default_branch
+            #TODO create branch selector form
+            branch_form = BranchSelector()
+            branch_form.fields['branch'].widget.choices = \
+                [(branch, branch) for branch in self.request.session[f'{repo}__branches']]
+            context['branch_form'] = branch_form
             if not path:
                 contents = repo.get_contents('', context['branch'])
                 context['path'] = ''

@@ -1,3 +1,4 @@
+from typing import Optional, Mapping, Union, Any, Type
 from django import forms
 
 
@@ -21,3 +22,7 @@ class BranchSelector(forms.Form):
 
     branch = forms.ChoiceField(required=True)
     
+    # def __init__(self, data: Optional[Mapping[str, Any]] = ..., *args, **kwargs) -> None:
+    #     super().__init__(data=data, *args, **kwargs)
+    #     self.fields
+
