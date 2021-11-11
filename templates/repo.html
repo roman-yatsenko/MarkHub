@@ -8,17 +8,21 @@
 
 {% block content %}
 <h2>
-  <i>{{ branch }}</i>: 
-  <a href ="{% url 'repo' repo %}">{{ repo }}</a> / 
-  {% if path_parts %}
-    {% for key, value in path_parts.items %}
-      {% if not forloop.last %}
-        <a href ="{% url 'repo' repo branch value %}">{{ key }}</a> / 
-      {% else %}
-        {{ key }}
-      {% endif %}
-    {% endfor %}  
+  {% comment %} <i>{{ branch }}</i>:  {% endcomment %}
+  <form method="post">
+    {% csrf_token %}
+    {{ branch_form.branch }}
+    <a href ="{% url 'repo' repo %}">{{ repo }}</a> / 
+    {% if path_parts %}
+      {% for key, value in path_parts.items %}
+        {% if not forloop.last %}
+          <a href ="{% url 'repo' repo branch value %}">{{ key }}</a> / 
+        {% else %}
+          {{ key }}
+        {% endif %}
+      {% endfor %}  
   {% endif %}
+  </form>
 </h2>
 <ul>
   {% for content in repo_contents %}

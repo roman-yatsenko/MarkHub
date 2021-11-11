@@ -221,10 +221,10 @@ class RepoView(LoginRequiredMixin, TemplateView):
             if 'branch' not in context:
                 context['branch'] = repo.default_branch
             #TODO create branch selector form
-            branch_form = BranchSelector()
-            branch_form.fields['branch'].widget.choices = \
-                [(branch, branch) for branch in self.request.session[f'{repo}__branches']]
-            context['branch_form'] = branch_form
+            context['branch_form'] = BranchSelector(
+                current_branch=context['branch'], 
+                branches=self.request.session[f'{context["repo"]}__branches']
+            )
             if not path:
                 contents = repo.get_contents('', context['branch'])
                 context['path'] = ''

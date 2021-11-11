@@ -22,7 +22,8 @@ class BranchSelector(forms.Form):
 
     branch = forms.ChoiceField(required=True)
     
-    # def __init__(self, data: Optional[Mapping[str, Any]] = ..., *args, **kwargs) -> None:
-    #     super().__init__(data=data, *args, **kwargs)
-    #     self.fields
-
+    def __init__(self, current_branch: str = '', branches: list = [], 
+                *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields['branch'].widget.choices = [(branch, branch) for branch in branches]
+        self.fields['branch'].initial = current_branch
