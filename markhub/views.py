@@ -1,13 +1,13 @@
-from typing import Any, Dict, Union
-from django.http import request
-from django.http.request import HttpRequest
-from django.http.response import HttpResponse
-from django.views.generic import TemplateView
+from typing import Any, Dict, Union, Optional
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.forms import BaseForm
+from django.http import Http404, request
+from django.http.request import HttpRequest
+from django.http.response import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.views.generic import TemplateView, FormView
 
 from pathlib import Path, PurePosixPath
 from github import Github
@@ -206,17 +206,25 @@ class HomeView(TemplateView):
         return context
 
 
-class RepoView(LoginRequiredMixin, TemplateView):
+class RepoView(LoginRequiredMixin, FormView):
     """ Repository view """
     
     template_name = 'repo.html'
+    form_class = BranchSelector
+
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        self.path = kwargs.get('path')
+        self.repo = get_session_repo(self.request, kwargs['repo'])
+        return super().setup(request, *args, **kwargs)
+    
+    def get_form(self, form_class: Optional[object] = None) -> BaseForm:
+        self.branch_form = super().get_form(form_class=form_class)
+        return self.branch_form
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
 
         context = super().get_context_data(**kwargs)
-        path = context.get('path')
-        repo = get_session_repo(self.request, context['repo'])
         if repo:
             if 'branch' not in context:
                 context['branch'] = repo.default_branch

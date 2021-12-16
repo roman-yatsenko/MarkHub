@@ -18,7 +18,7 @@ class UpdateFileForm(forms.Form):
 
 
 class BranchSelector(forms.Form):
-    """ Barnch Selector Form"""
+    """ Branch Selector Form"""
 
     branch = forms.ChoiceField(required=True)
     
