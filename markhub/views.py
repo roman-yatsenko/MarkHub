@@ -210,44 +210,46 @@ class RepoView(LoginRequiredMixin, FormView):
     """ Repository view """
     
     template_name = 'repo.html'
-    form_class = BranchSelector
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
-        self.path = kwargs.get('path')
         self.repo = get_session_repo(self.request, kwargs['repo'])
+        self.path = kwargs.get('path')
+        self.branch = kwargs.get('branch', self.repo.default_branch)
         return super().setup(request, *args, **kwargs)
     
     def get_form(self, form_class: Optional[object] = None) -> BaseForm:
-        self.branch_form = super().get_form(form_class=form_class)
+        """Create BranchSelector Form"""
+
+        self.branch_form = BranchSelector(
+            current_branch=self.branch, 
+            branches=self.request.session[f'{self.repo.name}__branches']
+        )
         return self.branch_form
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
 
         context = super().get_context_data(**kwargs)
-        if repo:
-            if 'branch' not in context:
-                context['branch'] = repo.default_branch
-            #TODO create branch selector form
-            context['branch_form'] = BranchSelector(
-                current_branch=context['branch'], 
-                branches=self.request.session[f'{context["repo"]}__branches']
+        context['branch'] = self.branch
+        if not self.path:
+            contents = self.repo.get_contents('', context['branch'])
+            context['path'] = ''
+        else:
+            contents = self.repo.get_dir_contents(self.path, self.branch)
+            context['path_parts'] = get_path_parts(self.path)
+        if isinstance(contents, list):
+            context['repo_contents'] = contents
+            contents.sort(
+                key=lambda item: item.type + item.name
             )
-            if not path:
-                contents = repo.get_contents('', context['branch'])
-                context['path'] = ''
-            else:
-                contents = repo.get_dir_contents(path, context['branch'])
-                context['path_parts'] = get_path_parts(path)
-            if isinstance(contents, list):
-                context['repo_contents'] = contents
-                contents.sort(
-                    key=lambda item: item.type + item.name
-                )
-            elif contents:
-                context['repo_contents'] = [contents]
-            context['html_url'] = f'{repo.html_url}/tree/{context["branch"]}/{path if path else ""}'
+        elif contents:
+            context['repo_contents'] = [contents]
+        context['html_url'] = f'{self.repo.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
         return context
+
+    def get_success_url(self) -> str:
+        """Get redirect url on POST request"""
+        return super().get_success_url()
 
 
 class FileView(LoginRequiredMixin, TemplateView):
