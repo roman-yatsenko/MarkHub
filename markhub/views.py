@@ -7,6 +7,7 @@ from django.http import Http404, request
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import TemplateView, FormView
 
 from pathlib import Path, PurePosixPath
@@ -212,7 +213,7 @@ class RepoView(LoginRequiredMixin, FormView):
     template_name = 'repo.html'
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
-        self.repo = get_session_repo(self.request, kwargs['repo'])
+        self.repo = get_session_repo(request, kwargs['repo'])
         self.path = kwargs.get('path')
         self.branch = kwargs.get('branch', self.repo.default_branch)
         return super().setup(request, *args, **kwargs)
@@ -230,6 +231,7 @@ class RepoView(LoginRequiredMixin, FormView):
         """Get context data for repository view"""
 
         context = super().get_context_data(**kwargs)
+        context['repo'] = self.repo.name
         context['branch'] = self.branch
         if not self.path:
             contents = self.repo.get_contents('', context['branch'])
@@ -247,9 +249,22 @@ class RepoView(LoginRequiredMixin, FormView):
         context['html_url'] = f'{self.repo.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
         return context
 
+    def form_valid(self, form) -> HttpResponse:
+        form.save()
+        return super().form_valid(form)
+    
     def get_success_url(self) -> str:
-        """Get redirect url on POST request"""
-        return super().get_success_url()
+        """Get redirect url on success POST request"""
+        print(reverse('repo', kwargs={
+            'repo': self.repo.name,
+            'branch': self.branch,
+            'path': self.path
+        })) 
+        return reverse('repo', kwargs={
+            'repo': self.repo.name,
+            'branch': self.branch,
+            'path': self.path
+        })
 
 
 class FileView(LoginRequiredMixin, TemplateView):

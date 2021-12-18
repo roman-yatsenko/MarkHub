@@ -20,7 +20,7 @@ class UpdateFileForm(forms.Form):
 class BranchSelector(forms.Form):
     """ Branch Selector Form"""
 
-    branch = forms.ChoiceField(required=True)
+    branch = forms.ChoiceField(required=True, widget=forms.Select(attrs={'onchange':"this.form.submit()"}))
     
     def __init__(self, current_branch: str = '', branches: list = [], 
                 *args, **kwargs) -> None:

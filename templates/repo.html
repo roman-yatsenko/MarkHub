@@ -8,10 +8,9 @@
 
 {% block content %}
 <h2>
-  {% comment %} <i>{{ branch }}</i>:  {% endcomment %}
-  <form method="post">
+  <form method="POST">
     {% csrf_token %}
-    {{ branch_form.branch }}
+    {{ form.branch }}
     <a href ="{% url 'repo' repo %}">{{ repo }}</a> / 
     {% if path_parts %}
       {% for key, value in path_parts.items %}
@@ -21,7 +20,7 @@
           {{ key }}
         {% endif %}
       {% endfor %}  
-  {% endif %}
+    {% endif %}
   </form>
 </h2>
 <ul>
