@@ -6,7 +6,7 @@ from django.forms import BaseForm
 from django.http import Http404, request
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, FormView
 
@@ -214,7 +214,7 @@ class RepoView(LoginRequiredMixin, FormView):
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         self.repo = get_session_repo(request, kwargs['repo'])
-        self.path = kwargs.get('path')
+        self.path = kwargs.get('path', '')
         self.branch = kwargs.get('branch', self.repo.default_branch)
         return super().setup(request, *args, **kwargs)
     
@@ -249,8 +249,20 @@ class RepoView(LoginRequiredMixin, FormView):
         context['html_url'] = f'{self.repo.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
         return context
 
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        form = BranchSelector(data=request.POST)
+        if form.is_valid():
+            self.branch = form.cleaned_data['branch']
+            print(self.branch)
+            form = self.get_form()
+        return redirect('repo', 
+            repo=self.repo.name,
+            branch=self.branch,
+            path=self.path
+        )
+    
     def form_valid(self, form) -> HttpResponse:
-        form.save()
+        print('form_valid')
         return super().form_valid(form)
     
     def get_success_url(self) -> str:
