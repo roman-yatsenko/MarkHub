@@ -10,7 +10,16 @@
 <h2>
   <form method="POST">
     {% csrf_token %}
-    {{ form.branch }}
+    {% comment %} {{ form.branch }} {% endcomment %}
+    <select id="branch_selector" name="delected_branch" onchange="this.form.submit();">
+      {% for branch in branches %}
+        {% if branch == current_branch %}
+          <option value='{{branch}}' selected>{{branch}}</option>
+        {% else %}
+        <option value='{{branch}}'>{{branch}}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
     <a href ="{% url 'repo' repo %}">{{ repo }}</a> / 
     {% if path_parts %}
       {% for key, value in path_parts.items %}

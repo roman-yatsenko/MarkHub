@@ -207,7 +207,7 @@ class HomeView(TemplateView):
         return context
 
 
-class RepoView(LoginRequiredMixin, FormView):
+class RepoView(LoginRequiredMixin, TemplateView):
     """ Repository view """
     
     template_name = 'repo.html'
@@ -218,15 +218,6 @@ class RepoView(LoginRequiredMixin, FormView):
         self.branch = kwargs.get('branch', self.repo.default_branch)
         return super().setup(request, *args, **kwargs)
     
-    def get_form(self, form_class: Optional[object] = None) -> BaseForm:
-        """Create BranchSelector Form"""
-
-        self.branch_form = BranchSelector(
-            current_branch=self.branch, 
-            branches=self.request.session[f'{self.repo.name}__branches']
-        )
-        return self.branch_form
-
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
 
