@@ -11,12 +11,12 @@
   <form method="POST">
     {% csrf_token %}
     {% comment %} {{ form.branch }} {% endcomment %}
-    <select id="branch_selector" name="delected_branch" onchange="this.form.submit();">
-      {% for branch in branches %}
-        {% if branch == current_branch %}
-          <option value='{{branch}}' selected>{{branch}}</option>
+    <select id="branch_selector" name="selected_branch" onchange="this.form.submit();">
+      {% for item in branches %}
+        {% if item == branch %}
+          <option value='{{item}}' selected>{{item}}</option>
         {% else %}
-        <option value='{{branch}}'>{{branch}}</option>
+        <option value='{{item}}'>{{item}}</option>
         {% endif %}
       {% endfor %}
     </select>

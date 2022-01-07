@@ -209,7 +209,6 @@ class HomeView(TemplateView):
 
 class RepoView(LoginRequiredMixin, TemplateView):
     """ Repository view """
-    
     template_name = 'repo.html'
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
@@ -220,12 +219,12 @@ class RepoView(LoginRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
-
         context = super().get_context_data(**kwargs)
         context['repo'] = self.repo.name
         context['branch'] = self.branch
+        context['branches'] = [branch.name for branch in self.repo.get_branches()]
         if not self.path:
-            contents = self.repo.get_contents('', context['branch'])
+            contents = self.repo.get_contents('', self.branch)
             context['path'] = ''
         else:
             contents = self.repo.get_dir_contents(self.path, self.branch)
@@ -241,43 +240,18 @@ class RepoView(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        form = BranchSelector(data=request.POST)
-        if form.is_valid():
-            self.branch = form.cleaned_data['branch']
-            print(self.branch)
-            form = self.get_form()
-        return redirect('repo', 
-            repo=self.repo.name,
-            branch=self.branch,
-            path=self.path
-        )
-    
-    def form_valid(self, form) -> HttpResponse:
-        print('form_valid')
-        return super().form_valid(form)
-    
-    def get_success_url(self) -> str:
-        """Get redirect url on success POST request"""
-        print(reverse('repo', kwargs={
-            'repo': self.repo.name,
-            'branch': self.branch,
-            'path': self.path
-        })) 
-        return reverse('repo', kwargs={
-            'repo': self.repo.name,
-            'branch': self.branch,
-            'path': self.path
-        })
+        """POST request handler to change current branch"""
+        if request.POST.get('selected_branch', False):
+            self.branch = request.POST.get('selected_branch')
+        return self.get(request, *args, **kwargs)
 
 
 class FileView(LoginRequiredMixin, TemplateView):
     """Repository file view"""
-
     template_name = 'file.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for file view"""
-
         context = super().get_context_data(**kwargs)
         path = context.get('path')
         repo = get_session_repo(self.request, context['repo'])
