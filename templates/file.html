@@ -14,18 +14,8 @@
 
 {% block content %}
 <h2>
-  <a href ="{% url 'repo' repo %}">{{ repo }}</a> /
-  {% if path_parts %}
-    {% for key, value in path_parts.items %}
-      {% if not forloop.last %}
-        <a href ="{% url 'repo' repo branch value %}">{{ key }}</a> / 
-      {% else %}
-        {{ key }}
-      {% endif %}
-    {% endfor %}  
-  {% endif %}
+  {% include "branch_path_form.html" %}
 </h2>
-<p>Branch: <i>{{ branch }}</i></p>
 <p>
   <a href="{% url 'update-file' repo path %}">Update file</a> 
   <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 

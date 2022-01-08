@@ -1,0 +1,23 @@
+<form method="POST">
+  {% csrf_token %}
+  {% comment %} {{ form.branch }} {% endcomment %}
+  <select id="branch_selector" name="selected_branch" onchange="this.form.submit();">
+    {% for item in branches %}
+      {% if item == branch %}
+        <option value='{{item}}' selected>{{item}}</option>
+      {% else %}
+        <option value='{{item}}'>{{item}}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+  <a href="{% url 'repo' repo %}">{{ repo }}</a> /
+  {% if path_parts %}
+    {% for key, value in path_parts.items %}
+      {% if not forloop.last %}
+        <a href="{% url 'repo' repo branch value %}">{{ key }}</a> /
+      {% else %}
+        {{ key }}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</form>

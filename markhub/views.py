@@ -16,78 +16,7 @@ from github.ContentFile import ContentFile
 from github.Repository import Repository
 
 from .forms import NewFileForm, UpdateFileForm, BranchSelector
-
-def get_github_handler(user: User) -> Union[Github, None]:
-    """ Get github handler for user
-
-    Args:
-        user: Django User
-
-    Returns:
-        Github object for user if it has a token, otherwise None
-    """
-    
-    social_account = user.socialaccount_set
-    if social_account.exists() and social_account.first().provider == 'github':
-        social_login = social_account.first().socialtoken_set
-        if social_login.exists():
-            return Github(social_login.first().token)    
-
-def get_user_repo(user: User, repo: str) -> Union[Repository, None]:
-    """ Get user repo
-    
-    Args: 
-        user: Django User
-        repo: Repository name
-
-    Returns: 
-        Repository object if it exists, otherwise None
-    """
-    g: Github = get_github_handler(user)
-    if g:
-        repo = g.get_repo(f"{user.username}/{repo}")
-        if repo:
-            return repo
-
-def get_session_repo(request: HttpRequest, repo: str) -> Union[Repository, None]:
-    """ Get Repository object for repo from session or via GitHub request
-    
-    Args: 
-        request: Django request object
-        repo: Repository name
-
-    Returns: 
-        Repository object cached in session or via GitHub request, otherwise None
-    """
-
-    if repo in request.session :
-        return request.session[repo]
-    else:
-        user = request.user
-        g: Github = get_github_handler(user)
-        if g:
-            repository = g.get_repo(f"{user.username}/{repo}")
-            if repository:
-                request.session[repo] = repository
-                request.session[f'{repo}__branches'] = [branch.name for branch in repository.get_branches()]
-                return repository
-    request.session['__current_repo__'] = repo
-
-def get_path_parts(path: str) -> Dict:
-    """ Get path parts dict for path
-    
-    Args:
-        path: repository item path
-
-    Returns:
-        Path parts dict (dir: path to dir)
-    """
-
-    path_parts = Path(path).parts
-    path_parts_dict = {}
-    for i in range(len(path_parts)):
-        path_parts_dict[path_parts[i]] = '/'.join(path_parts[:i+1])
-    return path_parts_dict
+from .services.github_repository import GitHubRepository, get_github_handler
 
 @login_required
 def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:
@@ -105,14 +34,14 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
-            repository = get_session_repo(request, repo)
+            repository = GitHubRepository(request, repo)
             if repository:
                 newfile_path = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}' 
-                repository.create_file(
+                repository.handler.create_file(
                     path=newfile_path, 
                     message=f"Add {new_file_form.cleaned_data['filename']} at MarkHub", 
                     content=new_file_form.cleaned_data['content'], 
-                    branch=repository.default_branch)
+                    branch=repository.branch)
                 request.method = 'GET'
                 return RepoView.as_view()(request, repo=repo, path=path)
     else:
@@ -136,19 +65,19 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
 
-    repository = get_session_repo(request, repo)
+    repository = GitHubRepository(request, repo)
     if repository:
         context = {
             'update': True,
             'title': 'Update file'
         }
-        contents = repository.get_contents(path)
+        contents = repository.handler.get_contents(path)
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
                 path_object = PurePosixPath(path)
                 parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-                repository.update_file(
+                repository.handler.update_file(
                     path=path, 
                     message=f"Update {path_object.name} at MarkHub", 
                     content=update_file_form.cleaned_data['content'],
@@ -179,12 +108,12 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
 
-    repository = get_session_repo(request, repo)
+    repository = GitHubRepository(request, repo)
     if repository:
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-        contents = repository.get_contents(path)
-        repository.delete_file(contents.path, f"Delete {path_object.name} at MarkHub", contents.sha)
+        contents = repository.handler.get_contents(path)
+        repository.handler.delete_file(contents.path, f"Delete {path_object.name} at MarkHub", contents.sha)
         return RepoView.as_view()(request, repo=repo, path=parent_path)
     else:
         raise Http404("Repository not found")
@@ -192,12 +121,10 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
 
 class HomeView(TemplateView):
     """ Home page view """
-    
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for home page view"""
-
         context = super().get_context_data(**kwargs)
         user = self.request.user
         if user.is_authenticated:
@@ -207,36 +134,21 @@ class HomeView(TemplateView):
         return context
 
 
-class RepoView(LoginRequiredMixin, TemplateView):
-    """ Repository view """
-    template_name = 'repo.html'
+class BaseRepoView(LoginRequiredMixin, TemplateView):
+    """ Base Repository view """
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
-        self.repo = get_session_repo(request, kwargs['repo'])
+        super().setup(request, *args, **kwargs)
+        self.repo = GitHubRepository(request, kwargs['repo'])
         self.path = kwargs.get('path', '')
-        self.branch = kwargs.get('branch', self.repo.default_branch)
-        return super().setup(request, *args, **kwargs)
+        self.branch = kwargs.get('branch', self.repo.branch)
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
         context = super().get_context_data(**kwargs)
         context['repo'] = self.repo.name
         context['branch'] = self.branch
-        context['branches'] = [branch.name for branch in self.repo.get_branches()]
-        if not self.path:
-            contents = self.repo.get_contents('', self.branch)
-            context['path'] = ''
-        else:
-            contents = self.repo.get_dir_contents(self.path, self.branch)
-            context['path_parts'] = get_path_parts(self.path)
-        if isinstance(contents, list):
-            context['repo_contents'] = contents
-            contents.sort(
-                key=lambda item: item.type + item.name
-            )
-        elif contents:
-            context['repo_contents'] = [contents]
-        context['html_url'] = f'{self.repo.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
+        context['branches'] = self.repo.branches
         return context
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
@@ -246,20 +158,38 @@ class RepoView(LoginRequiredMixin, TemplateView):
         return self.get(request, *args, **kwargs)
 
 
-class FileView(LoginRequiredMixin, TemplateView):
+class RepoView(BaseRepoView):
+    """ Repository view """
+    template_name = 'repo.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for repository view"""
+        context = super().get_context_data(**kwargs)
+        if not self.path:
+            contents = self.repo.handler.get_contents('', self.branch)
+            context['path'] = ''
+        else:
+            contents = self.repo.handler.get_dir_contents(self.path, self.branch)
+            context['path_parts'] = self.repo.get_path_parts(self.path)
+        if isinstance(contents, list):
+            context['repo_contents'] = contents
+            contents.sort(
+                key=lambda item: item.type + item.name
+            )
+        elif contents:
+            context['repo_contents'] = [contents]
+        context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
+        return context
+
+class FileView(BaseRepoView):
     """Repository file view"""
     template_name = 'file.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for file view"""
         context = super().get_context_data(**kwargs)
-        path = context.get('path')
-        repo = get_session_repo(self.request, context['repo'])
-        if repo:
-            context['path_parts'] = get_path_parts(path)
-            if 'branch' not in context:
-                context['branch'] = repo.default_branch
-            contents = repo.get_contents(path, context['branch'])
-            context['contents'] = contents.decoded_content.decode('UTF-8')
-            context['html_url'] = contents.html_url
+        context['path_parts'] = self.repo.get_path_parts(self.path)
+        contents = self.repo.handler.get_contents(self.path, context['branch'])
+        context['contents'] = contents.decoded_content.decode('UTF-8')
+        context['html_url'] = contents.html_url
         return context
