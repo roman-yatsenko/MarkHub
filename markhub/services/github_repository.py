@@ -30,10 +30,7 @@ class GitHubRepository:
         
         Args: 
             request: Django request object
-            repo: Repository name
-
-        Returns: 
-            Repository object cached in session or via GitHub request, otherwise None
+            repo_name: Repository name
         """
         if repo_name in request.session:
             self.handler: Repository =  request.session[repo_name]
@@ -46,11 +43,20 @@ class GitHubRepository:
                 self.handler = g.get_repo(f"{user.username}/{repo_name}")
                 if self.handler:
                     self.branches: List = [branch.name for branch in self.handler.get_branches()]
-                    self.branch = self.handler.default_branch
                     request.session[repo_name] = self.handler
                     request.session[f'{repo_name}__branches'] = self.branches
-                    request.session[f'{repo_name}__current_branch'] = self.branch
+                    self.save_current_branch(request, self.handler.default_branch)
         request.session['__current_repo__'] = repo_name
+
+    def save_current_branch(self, request: HttpRequest, branch: str) -> None:
+        """ Save repository in session
+        
+        Args:
+            request: Django request object
+            branch: branch name
+        """
+        self.branch = branch
+        request.session[f'{self.handler.name}__current_branch'] = self.branch
 
     @property
     def name(self) -> Optional[str]:

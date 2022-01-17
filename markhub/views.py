@@ -155,6 +155,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
         """POST request handler to change current branch"""
         if request.POST.get('selected_branch', False):
             self.branch = request.POST.get('selected_branch')
+            self.repo.save_current_branch(request, self.branch)
         return self.get(request, *args, **kwargs)
 
 
