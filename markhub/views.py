@@ -30,7 +30,6 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     Returns:
         rendered page
     """
-
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
         if new_file_form.is_valid():
@@ -43,7 +42,10 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
                     content=new_file_form.cleaned_data['content'], 
                     branch=repository.branch)
                 request.method = 'GET'
-                return RepoView.as_view()(request, repo=repo, path=path)
+                if path:
+                    return redirect('repo', repo=repo, branch=repository.branch, path=path)
+                else:
+                    return redirect('repo', repo=repo)
     else:
         new_file_form = NewFileForm()
     context = {
@@ -64,14 +66,13 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-
     repository = GitHubRepository(request, repo)
     if repository:
         context = {
             'update': True,
             'title': 'Update file'
         }
-        contents = repository.handler.get_contents(path)
+        contents = repository.handler.get_contents(path, ref=repository.branch)
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
@@ -83,8 +84,10 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
                     content=update_file_form.cleaned_data['content'],
                     sha=contents.sha,
                     branch=repository.branch)
-                request.method = 'GET'
-                return RepoView.as_view()(request, repo=repo, path=parent_path)
+                if path:
+                    return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
+                else:
+                    return redirect('repo', repo=repo)
         else:
             data = {
                 'filename': path,
@@ -108,7 +111,6 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-
     repository = GitHubRepository(request, repo)
     if repository:
         path_object = PurePosixPath(path)
@@ -119,7 +121,10 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             f"Delete {path_object.name} at MarkHub", 
             contents.sha, 
             branch=repository.branch)
-        return RepoView.as_view()(request, repo=repo, path=parent_path)
+        if path:
+            return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
+        else:
+            return redirect('repo', repo=repo)
     else:
         raise Http404("Repository not found")
 
