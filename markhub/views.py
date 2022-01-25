@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView, FormView
 
 from pathlib import Path, PurePosixPath
-from github import Github
+from github import Github, UnknownObjectException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
 
@@ -181,7 +181,10 @@ class RepoView(BaseRepoView):
             contents = self.repo.handler.get_contents('', self.branch)
             context['path'] = ''
         else:
-            contents = self.repo.handler.get_dir_contents(self.path, self.branch)
+            try:
+                contents = self.repo.handler.get_dir_contents(self.path, self.branch)
+            except UnknownObjectException:
+                raise Http404("Path not found")
             context['path_parts'] = self.repo.get_path_parts(self.path)
         if isinstance(contents, list):
             context['repo_contents'] = contents

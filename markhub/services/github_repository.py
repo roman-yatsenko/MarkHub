@@ -1,10 +1,10 @@
-from pathlib import Path, PurePosixPath
-from typing import Any, Dict, List, Union, Optional
+from pathlib import Path
+from typing import Dict, List, Union, Optional
 from django.contrib.auth.models import User
+from django.http import Http404
 from django.http.request import HttpRequest
 
-from github import Github
-from github.ContentFile import ContentFile
+from github import Github, UnknownObjectException
 from github.Repository import Repository
 
 def get_github_handler(user: User) -> Union[Github, None]:
@@ -40,13 +40,17 @@ class GitHubRepository:
             user: User = request.user
             g: Github = get_github_handler(user)
             if g:
-                self.handler = g.get_repo(f"{user.username}/{repo_name}")
-                if self.handler:
-                    self.branches: List = [branch.name for branch in self.handler.get_branches()]
-                    request.session[repo_name] = self.handler
-                    request.session[f'{repo_name}__branches'] = self.branches
-                    self.save_current_branch(request, self.handler.default_branch)
-        request.session['__current_repo__'] = repo_name
+                try:
+                    self.handler = g.get_repo(f"{user.username}/{repo_name}")
+                    if self.handler:
+                        self.branches: List = [branch.name for branch in self.handler.get_branches()]
+                        request.session[repo_name] = self.handler
+                        request.session[f'{repo_name}__branches'] = self.branches
+                        self.save_current_branch(request, self.handler.default_branch)
+                except UnknownObjectException:
+                    raise Http404("Repository not found")
+        if self.handler:
+            request.session['__current_repo__'] = repo_name
 
     def save_current_branch(self, request: HttpRequest, branch: str) -> None:
         """ Save repository in session
