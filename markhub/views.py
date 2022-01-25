@@ -115,7 +115,7 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     if repository:
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-        contents = repository.handler.get_contents(path)
+        contents = repository.handler.get_contents(path, ref=repository.branch)
         repository.handler.delete_file(
             contents.path, 
             f"Delete {path_object.name} at MarkHub", 
