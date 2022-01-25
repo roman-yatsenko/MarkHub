@@ -22,12 +22,12 @@ from .views import new_file_ctr, update_file_ctr, delete_file_ctr
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    re_path(r'^file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', FileView.as_view(), name='file'),
+    re_path(r'^file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.+)/$', FileView.as_view(), name='file'),
     re_path(r'^delete-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', delete_file_ctr, name='delete-file'),
     re_path(r'^new-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', new_file_ctr, name='new-file'),
     re_path(r'^new-file/(?P<repo>[-a-zA-Z0-9_\.]+)/$', new_file_ctr, name='new-file'),
-    re_path(r'^repo/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', RepoView.as_view(), name='repo'),
-    re_path(r'repo/(?P<repo>[-a-zA-Z0-9_\.]+)/$', RepoView.as_view(), name='repo'),
+    re_path(r'^repo/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.*)/$', RepoView.as_view(), name='repo'),
+    re_path(r'^repo/(?P<repo>[-a-zA-Z0-9_\.]+)/$', RepoView.as_view(), name='repo'),
     re_path(r'^update-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', update_file_ctr, name='update-file'),
     path('', HomeView.as_view(), name='home'),
 ]
