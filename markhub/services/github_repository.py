@@ -47,8 +47,8 @@ class GitHubRepository:
                         request.session[repo_name] = self.handler
                         request.session[f'{repo_name}__branches'] = self.branches
                         self.save_current_branch(request, self.handler.default_branch)
-                except UnknownObjectException:
-                    raise Http404("Repository not found")
+                except UnknownObjectException as e:
+                    raise Http404(f"Repository not found - {e}")
         if self.handler:
             request.session['__current_repo__'] = repo_name
 

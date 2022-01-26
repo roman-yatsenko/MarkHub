@@ -1,21 +1,18 @@
-from typing import Any, Dict, Union, Optional
+from typing import Any, Dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
-from django.forms import BaseForm
-from django.http import Http404, request
+from django.core.exceptions import SuspiciousOperation
+from django.http import Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView
 
-from pathlib import Path, PurePosixPath
-from github import Github, UnknownObjectException
-from github.ContentFile import ContentFile
-from github.Repository import Repository
+from pathlib import PurePosixPath
+from github import GithubException, UnknownObjectException
 
-from .forms import NewFileForm, UpdateFileForm, BranchSelector
+from .forms import NewFileForm, UpdateFileForm
 from .services.github_repository import GitHubRepository, get_github_handler
 
 @login_required
@@ -183,8 +180,10 @@ class RepoView(BaseRepoView):
         else:
             try:
                 contents = self.repo.handler.get_dir_contents(self.path, self.branch)
-            except UnknownObjectException:
-                raise Http404("Path not found")
+            except UnknownObjectException as e:
+                raise Http404(f"Path not found - {e}")
+            except GithubException as e:
+                raise Http404(f"Path not found - {e}")
             context['path_parts'] = self.repo.get_path_parts(self.path)
         if isinstance(contents, list):
             context['repo_contents'] = contents
@@ -204,7 +203,12 @@ class FileView(BaseRepoView):
         """Get context data for file view"""
         context = super().get_context_data(**kwargs)
         context['path_parts'] = self.repo.get_path_parts(self.path)
-        contents = self.repo.handler.get_contents(self.path, context['branch'])
-        context['contents'] = contents.decoded_content.decode('UTF-8')
+        try:
+            contents = self.repo.handler.get_contents(self.path, context['branch'])
+            context['contents'] = contents.decoded_content.decode('UTF-8')
+        except GithubException as e:
+            raise Http404(f"File not found - {e}")
+        except UnicodeDecodeError as e:
+            raise SuspiciousOperation(f"Unicode decode error - {e}")
         context['html_url'] = contents.html_url
         return context
