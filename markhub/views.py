@@ -209,6 +209,7 @@ class FileView(BaseRepoView):
         except GithubException as e:
             raise Http404(f"File not found - {e}")
         except UnicodeDecodeError as e:
-            raise SuspiciousOperation(f"Unicode decode error - {e}")
+            context['decode_error'] = True
+            context['contents'] = f"Unicode decode error during openning {self.path}"
         context['html_url'] = contents.html_url
         return context
