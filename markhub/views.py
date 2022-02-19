@@ -69,7 +69,10 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             'update': True,
             'title': 'Update file'
         }
-        contents = repository.handler.get_contents(path, ref=repository.branch)
+        try:
+            contents = repository.handler.get_contents(path, ref=repository.branch)
+        except UnknownObjectException as e:
+                raise Http404(f"Path not found - {e}")
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
@@ -112,13 +115,16 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     if repository:
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-        contents = repository.handler.get_contents(path, ref=repository.branch)
-        contents = repository.handler.get_contents(path)
-        repository.handler.delete_file(
-            contents.path, 
-            f"Delete {path_object.name} at MarkHub", 
-            contents.sha, 
-            branch=repository.branch)
+        try:
+            contents = repository.handler.get_contents(path, ref=repository.branch)
+            repository.handler.delete_file(
+                contents.path, 
+                f"Delete {path_object.name} at MarkHub", 
+                contents.sha, 
+                branch=repository.branch
+            )
+        except UnknownObjectException as e:
+            raise Http404(f"Path not found - {e}")
         if path:
             return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
         else:
