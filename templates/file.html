@@ -16,10 +16,12 @@
 <h2>
   {% include "branch_path_form.html" %}
 </h2>
+{% if not decode_error %}
 <p>
   <a href="{% url 'update-file' repo path %}">Update file</a> 
   <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 
 </p>
+{% endif %}
 {% if contents %}
 <pre>
 {{ contents }}

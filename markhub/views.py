@@ -1,21 +1,17 @@
-from typing import Any, Dict, Union, Optional
+from typing import Any, Dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
-from django.forms import BaseForm
-from django.http import Http404, request
+from django.http import Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView
 
-from pathlib import Path, PurePosixPath
-from github import Github
-from github.ContentFile import ContentFile
-from github.Repository import Repository
+from pathlib import PurePosixPath
+from github import GithubException, UnknownObjectException
 
-from .forms import NewFileForm, UpdateFileForm, BranchSelector
+from .forms import NewFileForm, UpdateFileForm
 from .services.github_repository import GitHubRepository, get_github_handler
 
 @login_required
@@ -72,7 +68,10 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             'update': True,
             'title': 'Update file'
         }
-        contents = repository.handler.get_contents(path, ref=repository.branch)
+        try:
+            contents = repository.handler.get_contents(path, ref=repository.branch)
+        except UnknownObjectException as e:
+                raise Http404(f"Path not found - {e}")
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
@@ -115,13 +114,16 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     if repository:
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-        contents = repository.handler.get_contents(path, ref=repository.branch)
-        contents = repository.handler.get_contents(path)
-        repository.handler.delete_file(
-            contents.path, 
-            f"Delete {path_object.name} at MarkHub", 
-            contents.sha, 
-            branch=repository.branch)
+        try:
+            contents = repository.handler.get_contents(path, ref=repository.branch)
+            repository.handler.delete_file(
+                contents.path, 
+                f"Delete {path_object.name} at MarkHub", 
+                contents.sha, 
+                branch=repository.branch
+            )
+        except UnknownObjectException as e:
+            raise Http404(f"Path not found - {e}")
         if path:
             return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
         else:
@@ -181,7 +183,12 @@ class RepoView(BaseRepoView):
             contents = self.repo.handler.get_contents('', self.branch)
             context['path'] = ''
         else:
-            contents = self.repo.handler.get_dir_contents(self.path, self.branch)
+            try:
+                contents = self.repo.handler.get_dir_contents(self.path, self.branch)
+            except UnknownObjectException as e:
+                raise Http404(f"Path not found - {e}")
+            except GithubException as e:
+                raise Http404(f"Path not found - {e}")
             context['path_parts'] = self.repo.get_path_parts(self.path)
         if isinstance(contents, list):
             context['repo_contents'] = contents
@@ -201,7 +208,13 @@ class FileView(BaseRepoView):
         """Get context data for file view"""
         context = super().get_context_data(**kwargs)
         context['path_parts'] = self.repo.get_path_parts(self.path)
-        contents = self.repo.handler.get_contents(self.path, context['branch'])
-        context['contents'] = contents.decoded_content.decode('UTF-8')
+        try:
+            contents = self.repo.handler.get_contents(self.path, context['branch'])
+            context['contents'] = contents.decoded_content.decode('UTF-8')
+        except GithubException as e:
+            raise Http404(f"File not found - {e}")
+        except UnicodeDecodeError as e:
+            context['decode_error'] = True
+            context['contents'] = f"Unicode decode error during openning {self.path}"
         context['html_url'] = contents.html_url
         return context
