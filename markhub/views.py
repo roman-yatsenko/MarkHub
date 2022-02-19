@@ -1,7 +1,6 @@
 from typing import Any, Dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import SuspiciousOperation
 from django.http import Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
