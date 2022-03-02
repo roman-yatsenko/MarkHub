@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load martortags %}
 
 {% block title %}
   {% if user.is_authenticated %}
@@ -9,6 +10,8 @@
 {% endblock %}
 
 {% block css %}
+  <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'css/delete-modal.css' %}">
 {% endblock %}
 
@@ -23,9 +26,11 @@
 </p>
 {% endif %}
 {% if contents %}
-<pre>
-{{ contents }}
-</pre>
+<div class="martor-content">
+  <div class="martor-preview">
+  {{ contents|safe_markdown }}
+  </div>
+</div>
 {% endif %}
 <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
 
@@ -43,6 +48,15 @@
     </div>
   </form>
 </div>
+
+{% block js %}
+  <script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
+  <script>
+    $('.martor-preview pre').each(function(i, block){
+        hljs.highlightBlock(block);
+    });
+  </script>
+{% endblock %}
 
 <script>
 // Get the modal
