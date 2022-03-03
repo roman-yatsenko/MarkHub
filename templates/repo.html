@@ -7,24 +7,24 @@
 {% endblock %}
 
 {% block content %}
-<h2>
+<div class="container">
   {% include "branch_path_form.html" %}
-</h2>
-<ul>
-  {% for content in repo_contents %}
+  <ul>
+    {% for content in repo_contents %}
     {% if content.type == "dir"%}
-      <li>📁 <a href ="{% url 'repo' repo branch content.path %}">{{ content.name }}</a></li>
+    <li>📁 <a href ="{% url 'repo' repo branch content.path %}">{{ content.name }}</a></li>
     {% else %}
-      <li>📄 <a href ="{% url 'file' repo branch content.path %}">{{ content.name }}</a></li>
+    <li>📄 <a href ="{% url 'file' repo branch content.path %}">{{ content.name }}</a></li>
     {% endif %}
-  {% endfor %}
-</ul>
-<p>
-  {% if path %}
+    {% endfor %}
+  </ul>
+  <p>
+    {% if path %}
     <a href="{% url 'new-file' repo path %}">New file</a>
-  {% else %}
+    {% else %}
     <a href="{% url 'new-file' repo %}">New file</a>
-  {% endif %}
-</p>
-<p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+    {% endif %}
+  </p>
+  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+</div>
 {% endblock %}

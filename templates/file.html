@@ -16,47 +16,46 @@
 {% endblock %}
 
 {% block content %}
-<h2>
+<div class="container">
   {% include "branch_path_form.html" %}
-</h2>
-{% if not decode_error %}
-<p>
-  <a href="{% url 'update-file' repo path %}">Update file</a> 
-  <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 
-</p>
-{% endif %}
-{% if contents %}
-<div class="martor-content">
-  <div class="martor-preview">
-  {{ contents|safe_markdown }}
+  {% if not decode_error %}
+  <p>
+    <a href="{% url 'update-file' repo path %}">Update file</a> 
+    <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 
+  </p>
+  {% endif %}
+  {% if contents %}
+  <div class="martor-content">
+    <div class="martor-preview">
+      {{ contents|safe_markdown }}
+    </div>
   </div>
+  {% endif %}
+  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
 </div>
-{% endif %}
-<p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
-
+  
 <div id="delete-modal" class="modal">
   <span onclick="deleteModal.style.display='none'" class="close" title="Close Modal">&times;</span>
-  <form class="modal-content" action="/">
-    {% csrf_token %}
-    <div class="container">
-      <h1>Delete File</h1>
-      <p>Are you sure you want to delete <em>{{ path }}</em> ?</p>
-      <div class="clearfix">
-        <button type="button" class="cancelbtn" onclick="deleteModal.style.display='none'">Cancel</button>
-        <button type="button" class="deletebtn" onclick="location.href='{% url 'delete-file' repo path %}'">Delete</button>
-      </div>
+<form class="modal-content" action="/">
+  {% csrf_token %}
+  <div class="container">
+    <h1>Delete File</h1>
+    <p>Are you sure you want to delete <em>{{ path }}</em> ?</p>
+    <div class="clearfix">
+      <button type="button" class="cancelbtn" onclick="deleteModal.style.display='none'">Cancel</button>
+      <button type="button" class="deletebtn" onclick="location.href='{% url 'delete-file' repo path %}'">Delete</button>
     </div>
-  </form>
-</div>
+  </div>
+</form>
+{% endblock %}
 
 {% block js %}
-  <script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
-  <script>
-    $('.martor-preview pre').each(function(i, block){
-        hljs.highlightBlock(block);
-    });
-  </script>
-{% endblock %}
+<script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
+<script>
+  $('.martor-preview pre').each(function(i, block){
+      hljs.highlightBlock(block);
+  });
+</script>
 
 <script>
 // Get the modal

@@ -11,6 +11,7 @@
   
 {% block content %}
   {% if user.is_authenticated %}
+  <div class="container">
     <h2>Welcome {{ user.username }} !</h2>
     <p>Your repositories:</p>
     <ul>
@@ -18,7 +19,8 @@
       <li><a href="{% url 'repo' repo %}">{{ repo }}</a></li>
       {% endfor %}
     </ul>
-  {% else %}
+    {% else %}
     <a href="{% provider_login_url 'github' %}">Sign Up</a>
+  </div>
   {% endif %}
 {% endblock %}
