@@ -37,11 +37,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
                     message=f"Add {new_file_form.cleaned_data['filename']} at MarkHub", 
                     content=new_file_form.cleaned_data['content'], 
                     branch=repository.branch)
-                request.method = 'GET'
-                if path:
-                    return redirect('repo', repo=repo, branch=repository.branch, path=path)
-                else:
-                    return redirect('repo', repo=repo)
+                return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
     else:
         new_file_form = NewFileForm()
     context = {
@@ -83,10 +79,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
                     content=update_file_form.cleaned_data['content'],
                     sha=contents.sha,
                     branch=repository.branch)
-                if path:
-                    return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
-                else:
-                    return redirect('repo', repo=repo)
+                return redirect('file', repo=repo, branch=repository.branch, path=path)
         else:
             data = {
                 'filename': path,
