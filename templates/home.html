@@ -14,11 +14,11 @@
   <div class="container">
     <h2>Welcome {{ user.username }} !</h2>
     <p>Your repositories:</p>
-    <ul>
+    <div class="list-group">
       {% for repo in repos %}
-      <li><a href="{% url 'repo' repo %}">{{ repo }}</a></li>
+      <a href="{% url 'repo' repo %}" class="list-group-item list-group-item-action">{{ repo }}</a>
       {% endfor %}
-    </ul>
+    </div>
     {% else %}
     <div class="mt-4 p-5 bg-primary text-white rounded">
       <h1>MarkHub</h1>
