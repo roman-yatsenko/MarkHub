@@ -19,11 +19,15 @@
     {% endfor %}
   </ul>
   <p>
-    {% if path %}
-    <a href="{% url 'new-file' repo path %}">New file</a>
-    {% else %}
-    <a href="{% url 'new-file' repo %}">New file</a>
-    {% endif %}
+    <a 
+      class="btn btn-outline-primary" 
+      {% if path %}
+        href="{% url 'new-file' repo path %}"
+      {% else %}
+        href="{% url 'new-file' repo %}"
+      {% endif %}>
+      New file
+    </a>
   </p>
   <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
 </div>

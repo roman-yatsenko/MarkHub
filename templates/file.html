@@ -19,10 +19,6 @@
 <div class="container">
   {% include "branch_path_form.html" %}
   {% if not decode_error %}
-  <p>
-    <a href="{% url 'update-file' repo path %}">Update file</a> 
-    <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 
-  </p>
   {% endif %}
   {% if contents %}
   <div class="martor-content">
@@ -30,6 +26,10 @@
       {{ contents|safe_markdown }}
     </div>
   </div>
+  <p>
+    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Update</a> 
+    <a class="btn btn-outline-danger" href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete</a> 
+  </p>
   {% endif %}
   <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
 </div>

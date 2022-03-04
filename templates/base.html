@@ -19,7 +19,7 @@
 
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark mb-1 bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="{% url 'home' %}">MarkHub</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,9 +54,10 @@
     <div class="main-content">
       {% block messages %}
         {% if messages %}
-          <div class="messages">
+          <div class="messages mt-2">
             {% for message in messages %}
-              <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+              <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 {{ message }}
               </div>
             {% endfor %}
