@@ -1,31 +1,37 @@
-<form method="POST">
-  {% csrf_token %}
-  {% comment %} {{ form.branch }} {% endcomment %}
-  <select id="branch_selector" name="selected_branch" onchange="this.form.submit();">
-    {% for item in branches %}
-      {% if item == branch %}
-        <option value='{{item}}' selected>{{item}}</option>
-      {% else %}
-        <option value='{{item}}'>{{item}}</option>
+<ul class="nav mt-3 gap-2">
+  <li class="nav-item">
+    <form method="POST">
+      {% csrf_token %}
+      {% comment %} {{ form.branch }} {% endcomment %}
+      <select id="branch_selector" name="selected_branch" onchange="this.form.submit();">
+        {% for item in branches %}
+          {% if item == branch %}
+            <option value='{{item}}' selected>{{item}}</option>
+          {% else %}
+            <option value='{{item}}'>{{item}}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </form>
+  </li>
+  <li class="nav-item">
+    <ul class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'repo' repo %}">{{ repo }}</a> 
+      </li>
+      {% if path_parts %}
+        {% for key, value in path_parts.items %}
+          {% if not forloop.last %}
+            <li class="breadcrumb-item">
+              <a href="{% url 'repo' repo branch value %}">{{ key }}</a>
+            </li>
+          {% else %}
+            <li class="breadcrumb-item active">
+              {{ key }}
+            </li>
+          {% endif %}
+        {% endfor %}
       {% endif %}
-    {% endfor %}
-  </select>
-  <ul class="breadcrumb">
-    <li class="breadcrumb-item">
-      <a href="{% url 'repo' repo %}">{{ repo }}</a> 
-    </li>
-    {% if path_parts %}
-      {% for key, value in path_parts.items %}
-        {% if not forloop.last %}
-          <li class="breadcrumb-item">
-            <a href="{% url 'repo' repo branch value %}">{{ key }}</a>
-          </li>
-        {% else %}
-          <li class="breadcrumb-item active">
-            {{ key }}
-          </li>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-  </ul>
-</form>
+    </ul>
+  </li>
+</ul>
