@@ -11,7 +11,7 @@
   
 {% block content %}
   {% if user.is_authenticated %}
-  <div class="container">
+  <div class="container mt-2">
     <h2>Welcome {{ user.username }} !</h2>
     <p>Your repositories:</p>
     <div class="list-group">
@@ -20,7 +20,7 @@
       {% endfor %}
     </div>
     {% else %}
-    <div class="mt-4 p-5 bg-primary text-white rounded">
+    <div class="mt-4 mx-2 p-5 bg-primary text-white rounded">
       <h1>MarkHub</h1>
       <p class="display-6">This is your MarkDown GitHub!</p>
       <div class="mt-5 text-center">
