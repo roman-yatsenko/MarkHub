@@ -9,15 +9,19 @@
 {% block content %}
 <div class="container">
   {% include "branch_path_form.html" %}
-  <ul>
+  <div class="list-group">
     {% for content in repo_contents %}
-    {% if content.type == "dir"%}
-    <li>📁 <a href ="{% url 'repo' repo branch content.path %}">{{ content.name }}</a></li>
-    {% else %}
-    <li>📄 <a href ="{% url 'file' repo branch content.path %}">{{ content.name }}</a></li>
-    {% endif %}
+    <li class="list-group-item list-group-item-action">
+      {% if content.type == "dir"%}
+        📁 <a href ="{% url 'repo' repo branch content.path %}" class="text-decoration-none">
+      {% else %}
+        📄 <a href ="{% url 'file' repo branch content.path %}" class="text-decoration-none">
+      {% endif %}
+              {{ content.name }}
+            </a>
+    </li>
     {% endfor %}
-  </ul>
+  </div>
   <p>
     <a 
       class="btn btn-outline-primary" 

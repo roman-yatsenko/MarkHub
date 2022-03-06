@@ -16,7 +16,9 @@
     <p>Your repositories:</p>
     <div class="list-group">
       {% for repo in repos %}
-      <a href="{% url 'repo' repo %}" class="list-group-item list-group-item-action">{{ repo }}</a>
+      <a href="{% url 'repo' repo.0 %}" class="list-group-item list-group-item-action">{{ repo.0 }}
+        <br><small>Created at {{ repo.1|date:"SHORT_DATE_FORMAT" }}</small>
+      </a>
       {% endfor %}
     </div>
     {% else %}
