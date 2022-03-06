@@ -2,8 +2,8 @@
   <li class="nav-item">
     <form method="POST">
       {% csrf_token %}
-      {% comment %} {{ form.branch }} {% endcomment %}
-      <select id="branch_selector" name="selected_branch" onchange="this.form.submit();">
+      <select class="form-select form-select-sm" id="branch_selector" name="selected_branch" 
+          onchange="this.form.submit();">
         {% for item in branches %}
           {% if item == branch %}
             <option value='{{item}}' selected>{{item}}</option>
