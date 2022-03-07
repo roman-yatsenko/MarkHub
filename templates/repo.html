@@ -7,24 +7,32 @@
 {% endblock %}
 
 {% block content %}
-<h2>
+<div class="container">
   {% include "branch_path_form.html" %}
-</h2>
-<ul>
-  {% for content in repo_contents %}
-    {% if content.type == "dir"%}
-      <li>📁 <a href ="{% url 'repo' repo branch content.path %}">{{ content.name }}</a></li>
-    {% else %}
-      <li>📄 <a href ="{% url 'file' repo branch content.path %}">{{ content.name }}</a></li>
-    {% endif %}
-  {% endfor %}
-</ul>
-<p>
-  {% if path %}
-    <a href="{% url 'new-file' repo path %}">New file</a>
-  {% else %}
-    <a href="{% url 'new-file' repo %}">New file</a>
-  {% endif %}
-</p>
-<p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+  <div class="list-group">
+    {% for content in repo_contents %}
+    <li class="list-group-item list-group-item-action">
+      {% if content.type == "dir"%}
+        📁 <a href ="{% url 'repo' repo branch content.path %}" class="text-decoration-none">
+      {% else %}
+        📄 <a href ="{% url 'file' repo branch content.path %}" class="text-decoration-none">
+      {% endif %}
+              {{ content.name }}
+            </a>
+    </li>
+    {% endfor %}
+  </div>
+  <p class="mt-3">
+    <a 
+      class="btn btn-outline-primary" 
+      {% if path %}
+        href="{% url 'new-file' repo path %}"
+      {% else %}
+        href="{% url 'new-file' repo %}"
+      {% endif %}>
+      New file
+    </a>
+  </p>
+  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+</div>
 {% endblock %}

@@ -133,10 +133,8 @@ class HomeView(TemplateView):
         """Get context data for home page view"""
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        if user.is_authenticated:
-            g = get_github_handler(user)
-            if g:
-                context['repos'] = [repo.name for repo in g.get_user().get_repos()]
+        if user.is_authenticated and (g := get_github_handler(user)):
+            context['repos'] = [(repo.name, repo.created_at) for repo in g.get_user().get_repos()]
         return context
 
 

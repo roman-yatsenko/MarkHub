@@ -12,60 +12,58 @@
 {% block css %}
   <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
-  <link rel="stylesheet" href="{% static 'css/delete-modal.css' %}">
 {% endblock %}
 
 {% block content %}
-<h2>
+<div class="container">
   {% include "branch_path_form.html" %}
-</h2>
-{% if not decode_error %}
-<p>
-  <a href="{% url 'update-file' repo path %}">Update file</a> 
-  <a href="#" onclick="document.getElementById('delete-modal').style.display='block'">Delete file</a> 
-</p>
-{% endif %}
-{% if contents %}
-<div class="martor-content">
-  <div class="martor-preview">
-  {{ contents|safe_markdown }}
+  {% if not decode_error %}
+  {% endif %}
+  {% if contents %}
+  <div class="mb-3 martor-content border">
+    <div class="martor-preview">
+      {{ contents|safe_markdown }}
+    </div>
   </div>
+  <p>
+    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Update</a> 
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button> 
+  </p>
+  {% endif %}
+  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
 </div>
-{% endif %}
-<p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
-
-<div id="delete-modal" class="modal">
-  <span onclick="deleteModal.style.display='none'" class="close" title="Close Modal">&times;</span>
-  <form class="modal-content" action="/">
-    {% csrf_token %}
-    <div class="container">
-      <h1>Delete File</h1>
-      <p>Are you sure you want to delete <em>{{ path }}</em> ?</p>
-      <div class="clearfix">
-        <button type="button" class="cancelbtn" onclick="deleteModal.style.display='none'">Cancel</button>
-        <button type="button" class="deletebtn" onclick="location.href='{% url 'delete-file' repo path %}'">Delete</button>
+  
+<!-- The Modal -->
+<div class="modal" id="deleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Delete File</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+        Are you sure you want to delete <em>{{ path }}</em> ?
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" 
+            onclick="location.href='{% url 'delete-file' repo path %}'">
+          Confirm
+        </button>
       </div>
     </div>
-  </form>
+  </div>
 </div>
-
-{% block js %}
-  <script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
-  <script>
-    $('.martor-preview pre').each(function(i, block){
-        hljs.highlightBlock(block);
-    });
-  </script>
 {% endblock %}
 
+{% block js %}
+<script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
 <script>
-// Get the modal
-const deleteModal = document.getElementById('delete-modal');
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == deleteModal) {
-    deleteModal.style.display = "none";
-  }
-}
+  $('.martor-preview pre').each(function(i, block){
+      hljs.highlightBlock(block);
+  });
 </script>
 {% endblock %}
