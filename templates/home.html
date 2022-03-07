@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% load socialaccount %}
 
 
@@ -22,10 +23,10 @@
       {% endfor %}
     </div>
     {% else %}
-    <div class="mt-4 mx-2 p-5 bg-primary text-white rounded">
-      <h1>MarkHub</h1>
+    <div class="mt-4 mx-2 p-5 bg-secondary text-white text-center rounded">
+      <img src="{% static 'img/logo.png' %}" class="w-50 mx-auto d-block" alt="MarkHub logo">
       <p class="display-6">This is your MarkDown GitHub!</p>
-      <div class="mt-5 text-center">
+      <div class="mt-5">
         <a class="btn btn-success btn-lg" href="{% provider_login_url 'github' %}">Sign Up</a>
       </div>
     </div>
