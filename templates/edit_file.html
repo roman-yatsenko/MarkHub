@@ -26,14 +26,17 @@
     <div class="mb-3">
       {{ form.content }}
     </div>
-    <div class="form-group">
-      <button class="btn btn-success">
+    <div class="form-group d-flex justify-content-end">
+      <button type="submit" class="btn btn-success">
         <i class="save icon"></i>
         {% if update %}
         Update
         {% else %}
         Create
         {% endif %}
+      </button>
+      <button type="reset" class="ms-2 btn btn-outline-danger" onclick="javascript:history.back();">
+        Cancel
       </button>
     </div>
   </form>
