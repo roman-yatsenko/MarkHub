@@ -1,11 +1,13 @@
+from email import message
 from typing import Any, Dict
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.utils.html import format_html
 from django.views.generic import TemplateView
 
 from pathlib import PurePosixPath
@@ -31,12 +33,20 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         if new_file_form.is_valid():
             repository = GitHubRepository(request, repo)
             if repository:
-                newfile_path = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}' 
-                repository.handler.create_file(
+                filename: str = new_file_form.cleaned_data["filename"]
+                newfile_path: str = f'{path + "/" if path else ""}{filename}' 
+                status: dict = repository.handler.create_file(
                     path=newfile_path, 
-                    message=f"Add {new_file_form.cleaned_data['filename']} at MarkHub", 
+                    message=f"Add {filename} at MarkHub", 
                     content=new_file_form.cleaned_data['content'], 
                     branch=repository.branch)
+                message: str = format_html(
+                    'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
+                    newfile_path,
+                    status["commit"].html_url,
+                    status["commit"].sha[:7]
+                )
+                messages.success(request, message)
                 return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
     else:
         new_file_form = NewFileForm()
@@ -45,6 +55,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         'title': 'New file in'
     }
     return render(request, 'edit_file.html', context)
+    
 
 @login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
