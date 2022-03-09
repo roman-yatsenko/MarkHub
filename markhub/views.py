@@ -30,24 +30,22 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     """
     if request.method == 'POST':
         new_file_form = NewFileForm(request.POST)
-        if new_file_form.is_valid():
-            repository = GitHubRepository(request, repo)
-            if repository:
-                filename: str = new_file_form.cleaned_data["filename"]
-                newfile_path: str = f'{path + "/" if path else ""}{filename}' 
-                status: dict = repository.handler.create_file(
-                    path=newfile_path, 
-                    message=f"Add {filename} at MarkHub", 
-                    content=new_file_form.cleaned_data['content'], 
-                    branch=repository.branch)
-                message: str = format_html(
-                    'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
-                    newfile_path,
-                    status["commit"].html_url,
-                    status["commit"].sha[:7]
-                )
-                messages.success(request, message)
-                return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
+        if new_file_form.is_valid() and (repository := GitHubRepository(request, repo)):
+            filename: str = new_file_form.cleaned_data["filename"]
+            newfile_path: str = f'{path + "/" if path else ""}{filename}' 
+            status: dict = repository.handler.create_file(
+                path=newfile_path, 
+                message=f"Add {filename} at MarkHub", 
+                content=new_file_form.cleaned_data['content'], 
+                branch=repository.branch)
+            message: str = format_html(
+                'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
+                newfile_path,
+                status["commit"].html_url,
+                status["commit"].sha[:7]
+            )
+            messages.success(request, message)
+            return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
     else:
         new_file_form = NewFileForm()
     context = {
@@ -69,8 +67,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-    repository = GitHubRepository(request, repo)
-    if repository:
+    if repository := GitHubRepository(request, repo):
         context = {
             'update': True,
             'title': 'Update file'
@@ -83,13 +80,19 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
                 path_object = PurePosixPath(path)
-                parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-                repository.handler.update_file(
+                status: dict = repository.handler.update_file(
                     path=path, 
                     message=f"Update {path_object.name} at MarkHub", 
                     content=update_file_form.cleaned_data['content'],
                     sha=contents.sha,
                     branch=repository.branch)
+                message: str = format_html(
+                    'File {} was successfully updated with commit <a href="{}" target="_blank">{}</a>.',
+                    path,
+                    status["commit"].html_url,
+                    status["commit"].sha[:7]
+                )
+                messages.success(request, message)
                 return redirect('file', repo=repo, branch=repository.branch, path=path)
         else:
             data = {
@@ -114,18 +117,24 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-    repository = GitHubRepository(request, repo)
-    if repository:
+    if repository := GitHubRepository(request, repo):
         path_object = PurePosixPath(path)
         parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
         try:
             contents = repository.handler.get_contents(path, ref=repository.branch)
-            repository.handler.delete_file(
+            status: dict = repository.handler.delete_file(
                 contents.path, 
                 f"Delete {path_object.name} at MarkHub", 
                 contents.sha, 
                 branch=repository.branch
             )
+            message: str = format_html(
+                    'File {} was successfully deleted with commit <a href="{}" target="_blank">{}</a>.',
+                    path,
+                    status["commit"].html_url,
+                    status["commit"].sha[:7]
+                )
+            messages.success(request, message)
         except UnknownObjectException as e:
             raise Http404(f"Path not found - {e}")
         if path:
