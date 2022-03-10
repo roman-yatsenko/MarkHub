@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Successful messages for file operations
-- 
+ 
 ### Changed
 - Home page description
+- Settings stucture
+
 ### Deprecated
 
 ### Removed
