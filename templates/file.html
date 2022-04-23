@@ -18,12 +18,6 @@
 {% block content %}
 <div class="container">
   {% include "branch_path_form.html" %}
-  {% if not decode_error %}
-  <p>
-    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Update</a> 
-    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button> 
-  </p>
-  {% endif %}
   {% if contents %}
   <div class="mb-3 martor-content border">
     <div class="martor-preview">
