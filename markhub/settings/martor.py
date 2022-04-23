@@ -63,6 +63,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.nl2br',
     'markdown.extensions.smarty',
     'markdown.extensions.fenced_code',
+    'markdown.extensions.admonition',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
