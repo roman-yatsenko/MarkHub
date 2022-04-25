@@ -77,7 +77,11 @@ MARTOR_MARKDOWN_EXTENSIONS = [
 ]
 
 # Markdown Extensions Configs
-MARTOR_MARKDOWN_EXTENSION_CONFIGS = {}
+MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
+    'markdown.extensions.smarty': {
+        'smart_angled_quotes': True,
+    }
+}
 
 # Markdown urls
 MARTOR_UPLOAD_URL = '/martor/uploader/' # default
