@@ -12,19 +12,20 @@
 {% block css %}
   <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
 <div class="container">
   {% include "branch_path_form.html" %}
-  {% if not decode_error %}
-  {% endif %}
   {% if contents %}
   <div class="mb-3 martor-content border">
     <div class="martor-preview">
       {{ contents|safe_markdown }}
     </div>
   </div>
+  {% endif %}
+  {% if not decode_error %}
   <p>
     <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Update</a> 
     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button> 

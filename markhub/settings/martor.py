@@ -1,5 +1,7 @@
 from .django import BASE_DIR
 
+from markdown.extensions.toc import slugify_unicode
+
 
 # martor settings
 
@@ -63,6 +65,10 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.nl2br',
     'markdown.extensions.smarty',
     'markdown.extensions.fenced_code',
+    'markdown.extensions.admonition',
+    'markdown.extensions.meta',
+    'markdown.extensions.sane_lists',
+    'markdown.extensions.toc',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
@@ -74,7 +80,16 @@ MARTOR_MARKDOWN_EXTENSIONS = [
 ]
 
 # Markdown Extensions Configs
-MARTOR_MARKDOWN_EXTENSION_CONFIGS = {}
+MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
+    'markdown.extensions.smarty': {
+        'smart_angled_quotes': True,
+    },
+    'markdown.extensions.toc': {
+        'permalink': True,
+        'slugify': slugify_unicode,
+        'toc_depth': '1-3',
+    },
+}
 
 # Markdown urls
 MARTOR_UPLOAD_URL = '/martor/uploader/' # default
