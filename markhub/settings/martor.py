@@ -1,5 +1,7 @@
 from .django import BASE_DIR
 
+from markdown.extensions.toc import slugify_unicode
+
 
 # martor settings
 
@@ -66,6 +68,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.admonition',
     'markdown.extensions.meta',
     'markdown.extensions.sane_lists',
+    'markdown.extensions.toc',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
@@ -80,7 +83,12 @@ MARTOR_MARKDOWN_EXTENSIONS = [
 MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     'markdown.extensions.smarty': {
         'smart_angled_quotes': True,
-    }
+    },
+    'markdown.extensions.toc': {
+        'permalink': True,
+        'slugify': slugify_unicode,
+        'toc_depth': '1-3',
+    },
 }
 
 # Markdown urls
