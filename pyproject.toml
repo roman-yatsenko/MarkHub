@@ -12,6 +12,7 @@ django-allauth = "~0.45"
 PyGithub = "~1.55"
 django-environ = "~0.7.0"
 martor = "~1.6.11"
+pymdown-extensions = "~9.4"
 
 [tool.poetry.dev-dependencies]
 

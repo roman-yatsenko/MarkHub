@@ -61,18 +61,21 @@ MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
 
 # Markdown extensions (default)
 MARTOR_MARKDOWN_EXTENSIONS = [
-    'markdown.extensions.extra',
+    # 'markdown.extensions.extra',
     'markdown.extensions.nl2br',
     'markdown.extensions.smarty',
-    'markdown.extensions.fenced_code',
+    # 'markdown.extensions.fenced_code',
     'markdown.extensions.admonition',
     'markdown.extensions.meta',
     'markdown.extensions.sane_lists',
     'markdown.extensions.toc',
 
+    # pymdownx extensions.
+    'pymdownx.extra',
+
     # Custom markdown extensions.
     'martor.extensions.urlize',
-    'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
+    # 'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
     'martor.extensions.mention',      # to parse markdown mention
     'martor.extensions.emoji',        # to parse markdown emoji
     'martor.extensions.mdx_video',    # to parse embed/iframe video
@@ -88,6 +91,11 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'permalink': True,
         'slugify': slugify_unicode,
         'toc_depth': '1-3',
+    },
+    'pymdownx.extra': {
+        'pymdownx.betterem': {
+            'smart_enable': 'all'
+        },
     },
 }
 
