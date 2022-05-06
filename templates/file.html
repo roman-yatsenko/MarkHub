@@ -12,6 +12,7 @@
 {% block css %}
   <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.3/katex.min.css" integrity="sha512-07YhC3P4/vS5HdgGuNAAeIxb5ee//efgRNo5AGdMtqFBUPYOdQG/sDK0Nl5qNq94kdEk/Pvu8pmN4GYUeucUkw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
@@ -61,6 +62,11 @@
 {% endblock %}
 
 {% block js %}
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.3/katex.min.js" integrity="sha512-aMDiFsrEV3KzAn9EHwyBRS7y1APjZWt/Z/73ukLN2Ca2KcGGzlOQFQSnfOdnEcehpwMaQ8edlDB/0cMX2GsHbg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> {% endcomment %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+{% comment %} <script type="text/javascript" src="{% static 'js/katex-loader.js' %}"></script> {% endcomment %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}"></script>
 <script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
 <script>
   $('.martor-preview pre').each(function(i, block){

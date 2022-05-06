@@ -61,17 +61,18 @@ MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
 
 # Markdown extensions (default)
 MARTOR_MARKDOWN_EXTENSIONS = [
-    # 'markdown.extensions.extra',
-    'markdown.extensions.nl2br',
-    'markdown.extensions.smarty',
-    # 'markdown.extensions.fenced_code',
     'markdown.extensions.admonition',
+    # 'markdown.extensions.fenced_code',
+    # 'markdown.extensions.extra',
     'markdown.extensions.meta',
+    'markdown.extensions.nl2br',
     'markdown.extensions.sane_lists',
+    'markdown.extensions.smarty',
     'markdown.extensions.toc',
 
     # pymdownx extensions.
     'pymdownx.extra',
+    'pymdownx.arithmatex',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
@@ -96,6 +97,9 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'pymdownx.betterem': {
             'smart_enable': 'all'
         },
+    },
+    'pymdownx.arithmatex': {
+        'generic': True,
     },
 }
 
