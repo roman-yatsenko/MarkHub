@@ -70,7 +70,10 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     if repository := GitHubRepository(request, repo):
         context = {
             'update': True,
-            'title': 'Update file'
+            'title': 'Update file',
+            'repo': repository.name,
+            'branch': repository.branch,
+            'path': path,
         }
         try:
             contents = repository.handler.get_contents(path, ref=repository.branch)
