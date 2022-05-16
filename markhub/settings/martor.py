@@ -1,6 +1,7 @@
 from .django import BASE_DIR
 
 from markdown.extensions.toc import slugify_unicode
+from pymdownx import emoji
 
 
 # martor settings
@@ -75,6 +76,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.arithmatex',
     'pymdownx.caret',
     'pymdownx.details',
+    'pymdownx.emoji',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
@@ -102,6 +104,10 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     },
     'pymdownx.arithmatex': {
         'generic': True,
+    },
+    'pymdownx.emoji': {
+        'emoji_index': emoji.twemoji,
+        'emoji_generator': emoji.to_png,
     },
 }
 

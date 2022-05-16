@@ -32,3 +32,11 @@ https://github.com/mkdocs/mkdocs/blob/master/mkdocs/themes/mkdocs/css/base.css *
     font-weight: bold;
     text-align: left;
 }
+
+/* Emoji extension styles */
+
+div.martor-preview img.twemoji {
+    display: inline-flex;
+    height: 1.125em;
+    vertical-align: text-top;
+}
