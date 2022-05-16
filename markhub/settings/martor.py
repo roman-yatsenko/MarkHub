@@ -73,6 +73,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     # pymdownx extensions.
     'pymdownx.extra',
     'pymdownx.arithmatex',
+    'pymdownx.caret',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
