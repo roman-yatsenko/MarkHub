@@ -62,10 +62,10 @@
 
 {% block js %}
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
-<script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
+{% comment %} <script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
 <script>
   $('.martor-preview pre').each(function(i, block){
       hljs.highlightBlock(block);
   });
-</script>
+</script> {% endcomment %}
 {% endblock %}
