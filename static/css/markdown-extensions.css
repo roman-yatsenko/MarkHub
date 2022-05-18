@@ -117,3 +117,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+/* SuperFences styles */
+
+div.martor-preview .highlight table tr {
+    border-top: 0;
+    background-color: inherit;
+}
+
+div.martor-preview .highlight table td, div.martor-preview .highlight table th {
+    border: 0;
+    padding: 5px 5px;
+}
+div.martor-preview .highlight table pre {
+    border: 0;
+    padding: 0;
+}
