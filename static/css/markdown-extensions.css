@@ -133,3 +133,12 @@ div.martor-preview .highlight table pre {
     border: 0;
     padding: 0;
 }
+
+div.martor-preview .highlight table td.linenos > .linenodiv {
+    border-right: 1px solid #ccc;
+}
+
+div.martor-preview .highlight .filename {
+    padding: 16px;
+    font-weight: bold;
+}
