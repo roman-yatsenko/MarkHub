@@ -27,7 +27,7 @@
   {% endif %}
   {% if not decode_error %}
   <p>
-    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Update</a> 
+    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Edit</a> 
     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button> 
   </p>
   {% endif %}
@@ -62,10 +62,4 @@
 
 {% block js %}
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
-{% comment %} <script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
-<script>
-  $('.martor-preview pre').each(function(i, block){
-      hljs.highlightBlock(block);
-  });
-</script> {% endcomment %}
 {% endblock %}
