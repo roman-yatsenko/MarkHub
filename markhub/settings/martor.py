@@ -79,6 +79,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.emoji',
     'pymdownx.highlight',
     'pymdownx.inlinehilite',
+    'pymdownx.keys',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
