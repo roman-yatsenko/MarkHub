@@ -84,6 +84,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.smartsymbols',
     'pymdownx.tabbed',
     'pymdownx.tasklist',
+    'pymdownx.tilde',
 
     # Custom markdown extensions.
     'martor.extensions.urlize',
