@@ -73,6 +73,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
 
     # pymdownx extensions.
     'pymdownx.extra',
+    'pymdownx.escapeall',
     'pymdownx.arithmatex',
     'pymdownx.caret',
     'pymdownx.critic',
@@ -90,7 +91,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     # Custom markdown extensions.
     'martor.extensions.urlize',
     # 'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
-    'martor.extensions.mention',      # to parse markdown mention
+    # 'martor.extensions.mention',      # to parse markdown mention
     # 'martor.extensions.emoji',        # to parse markdown emoji
     'martor.extensions.mdx_video',    # to parse embed/iframe video
     'martor.extensions.escape_html',  # to handle the XSS vulnerabilities
@@ -118,6 +119,9 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'emoji_index': emoji.twemoji,
         'emoji_generator': emoji.to_png,
     },
+    # 'pymdonx.escapeall': {
+    #     'nbsp': True,
+    # },
 }
 
 # Markdown urls
