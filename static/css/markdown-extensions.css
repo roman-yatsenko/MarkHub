@@ -209,4 +209,118 @@ div.martor-preview .task-list-item input[type="checkbox"] {
     margin: 0 4px 0.25em -20px;
     vertical-align: middle;
 }
-  
+ 
+/* Critic styles */
+
+/* Critic Markup */
+.martor-preview .critic {
+    font-family: inherit;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    text-decoration: none;
+}
+
+.martor-preview .critic:before,
+.martor-preview .critic:after {
+    content: '\00a0';
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    font-size: initial;
+}
+
+.martor-preview .block:before,
+.martor-preview .block:after {
+    content: '';
+}
+
+.martor-preview mark.critic {
+    border-color: #ff8600;
+    background: #ffddaa;
+}
+
+.martor-preview ins.critic {
+    border-color: #00bb00;
+    background: #ddffdd;
+}
+
+.martor-preview del.critic {
+    border-color: #dd0000;
+    background: #ffdddd;
+}
+
+.martor-preview ins.break,
+.martor-preview del.break {
+    font-size: 0;
+    border: none;
+}
+
+.martor-preview ins.break:before,
+.martor-preview del.break:before {
+    content: '\00a0\b6\00a0';
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.martor-preview ins.after,
+.martor-preview del.after {
+    content: '';
+}
+
+.martor-preview ins.break:before {
+    color: #00bb00;
+    border: 1px solid #00bb00;
+    background: #ddffdd;
+}
+
+.martor-preview del.break:before {
+    color: #bb0000;
+    border: 1px solid #bb0000;
+    background: #ffdddd;
+}
+
+.martor-preview span.critic {
+    background: #ddddff;
+    border: 0;
+    border-top: 1px solid #0000bb;
+    border-bottom: 1px solid #0000bb;
+}
+
+.martor-preview span.critic:before,
+.martor-preview span.critic:after {
+    font-size: inherit;
+    background: #ddddff;
+    border: 1px solid #0000bb;
+}
+
+.martor-preview span.critic:before {
+    content: '\00a0\bb';
+    border-right: none;
+    -webkit-border-top-left-radius: 3px;
+    -moz-border-top-left-radius: 3px;
+    border-top-left-radius: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+    -moz-border-bottom-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.martor-preview span.critic:after {
+    content: '\ab\00a0';
+    border-left: none;
+    -webkit-border-top-right-radius: 3px;
+    -moz-border-top-right-radius: 3px;
+    border-top-right-radius: 3px;
+    -webkit-border-bottom-right-radius: 3px;
+    -moz-border-bottom-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.martor-preview .block {
+    display: block;
+    padding: .02em;
+}

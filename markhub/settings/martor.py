@@ -75,6 +75,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.extra',
     'pymdownx.arithmatex',
     'pymdownx.caret',
+    'pymdownx.critic',
     'pymdownx.details',
     'pymdownx.emoji',
     'pymdownx.highlight',
