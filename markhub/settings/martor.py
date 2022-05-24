@@ -118,7 +118,7 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     },
     'pymdownx.emoji': {
         'emoji_index': emoji.twemoji,
-        'emoji_generator': emoji.to_png,
+        'emoji_generator': emoji.to_svg,
     },
     # 'pymdonx.escapeall': {
     #     'nbsp': True,
