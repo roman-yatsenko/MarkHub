@@ -82,6 +82,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.highlight',
     'pymdownx.inlinehilite',
     'pymdownx.keys',
+    'pymdownx.magiclink',
     'pymdownx.mark',
     'pymdownx.smartsymbols',
     'pymdownx.tabbed',
@@ -89,7 +90,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.tilde',
 
     # Custom markdown extensions.
-    'martor.extensions.urlize',
+    # 'martor.extensions.urlize',
     # 'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
     # 'martor.extensions.mention',      # to parse markdown mention
     # 'martor.extensions.emoji',        # to parse markdown emoji
@@ -122,6 +123,10 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     # 'pymdonx.escapeall': {
     #     'nbsp': True,
     # },
+    'pymdownx.magiclink': {
+        'repo_url_shortener': True,
+        'repo_url_shorthand': True,
+    },
 }
 
 # Markdown urls
