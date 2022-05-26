@@ -21,7 +21,6 @@
     {% csrf_token %}
     <div class="mb-3 mt-3">
       <label for="email" class="form-label">File name:</label>
-      {% comment %} <input type="email" class="form-control" id="email" placeholder="Enter email" name="email"> {% endcomment %}
       {{ form.filename }}
     </div>
     <div class="mb-3">
@@ -36,9 +35,7 @@
         Create
         {% endif %}
       </button>
-      <button type="reset" class="ms-2 btn btn-outline-danger" onclick="javascript:history.back();">
-        Cancel
-      </button>
+      <a class="btn btn-outline-danger ms-2" href="{% url 'file' repo branch path %}" role="button">Cancel</a>
     </div>
   </form>
 </div>
@@ -51,8 +48,8 @@
 <script type="text/javascript" src="{% static 'plugins/js/theme-github.js' %}"></script>
 <script type="text/javascript" src="{% static 'plugins/js/typo.js' %}"></script>
 <script type="text/javascript" src="{% static 'plugins/js/spellcheck.js' %}"></script>
-<script type="text/javascript" src="{% static 'plugins/js/highlight.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'plugins/js/resizable.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'plugins/js/emojis.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'martor/js/martor.bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
 {% endblock %}

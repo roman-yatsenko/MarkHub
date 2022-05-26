@@ -1,6 +1,7 @@
 from .django import BASE_DIR
 
 from markdown.extensions.toc import slugify_unicode
+from pymdownx import emoji
 
 
 # martor settings
@@ -11,13 +12,13 @@ MARTOR_THEME = 'bootstrap'
 # Global martor settings
 # Input: string boolean, `true/false`
 MARTOR_ENABLE_CONFIGS = {
-    'emoji': 'true',        # to enable/disable emoji icons.
+    'emoji': 'false',        # to enable/disable emoji icons.
     'imgur': 'true',        # to enable/disable imgur/custom uploader.
     'mention': 'false',     # to enable/disable mention
     'jquery': 'true',       # to include/revoke jquery (require for admin default django)
     'living': 'false',      # to enable/disable live updates in preview
     'spellcheck': 'false',  # to enable/disable spellcheck in form textareas
-    'hljs': 'true',         # to enable/disable hljs highlighting in preview
+    'hljs': 'false',         # to enable/disable hljs highlighting in preview
 }
 
 # To show the toolbar buttons
@@ -61,20 +62,36 @@ MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
 
 # Markdown extensions (default)
 MARTOR_MARKDOWN_EXTENSIONS = [
-    'markdown.extensions.extra',
-    'markdown.extensions.nl2br',
-    'markdown.extensions.smarty',
-    'markdown.extensions.fenced_code',
     'markdown.extensions.admonition',
     'markdown.extensions.meta',
+    'markdown.extensions.nl2br',
     'markdown.extensions.sane_lists',
+    'markdown.extensions.smarty',
     'markdown.extensions.toc',
 
+    # pymdownx extensions.
+    'pymdownx.extra',
+    'pymdownx.escapeall',
+    'pymdownx.arithmatex',
+    'pymdownx.caret',
+    'pymdownx.critic',
+    'pymdownx.details',
+    'pymdownx.emoji',
+    'pymdownx.highlight',
+    'pymdownx.inlinehilite',
+    'pymdownx.keys',
+    'pymdownx.magiclink',
+    'pymdownx.mark',
+    'pymdownx.smartsymbols',
+    'pymdownx.tabbed',
+    'pymdownx.tasklist',
+    'pymdownx.tilde',
+
     # Custom markdown extensions.
-    'martor.extensions.urlize',
-    'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
-    'martor.extensions.mention',      # to parse markdown mention
-    'martor.extensions.emoji',        # to parse markdown emoji
+    # 'martor.extensions.urlize',
+    # 'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
+    # 'martor.extensions.mention',      # to parse markdown mention
+    # 'martor.extensions.emoji',        # to parse markdown emoji
     'martor.extensions.mdx_video',    # to parse embed/iframe video
     'martor.extensions.escape_html',  # to handle the XSS vulnerabilities
 ]
@@ -88,6 +105,22 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'permalink': True,
         'slugify': slugify_unicode,
         'toc_depth': '1-3',
+    },
+    'pymdownx.extra': {
+        'pymdownx.betterem': {
+            'smart_enable': 'all'
+        },
+    },
+    'pymdownx.arithmatex': {
+        'generic': True,
+    },
+    'pymdownx.emoji': {
+        'emoji_index': emoji.twemoji,
+        'emoji_generator': emoji.to_svg,
+    },
+    'pymdownx.magiclink': {
+        'repo_url_shortener': True,
+        'repo_url_shorthand': True,
     },
 }
 
