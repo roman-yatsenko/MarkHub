@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Python-Markdown extensions
 - PyMdown Extensions
 - MathJax math rendering
+- Pygments code highlightning
  
 ### Changed
 - Home page description
