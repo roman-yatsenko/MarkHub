@@ -63,8 +63,6 @@ MARTOR_MARKDOWNIFY_URL = '/martor/markdownify/' # default
 # Markdown extensions (default)
 MARTOR_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.admonition',
-    # 'markdown.extensions.fenced_code',
-    # 'markdown.extensions.extra',
     'markdown.extensions.meta',
     'markdown.extensions.nl2br',
     'markdown.extensions.sane_lists',
@@ -120,9 +118,6 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'emoji_index': emoji.twemoji,
         'emoji_generator': emoji.to_svg,
     },
-    # 'pymdonx.escapeall': {
-    #     'nbsp': True,
-    # },
     'pymdownx.magiclink': {
         'repo_url_shortener': True,
         'repo_url_shorthand': True,
