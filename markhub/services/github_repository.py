@@ -1,11 +1,14 @@
 from pathlib import Path
 from typing import Dict, List, Union, Optional
+
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.http.request import HttpRequest
 
 from github import Github, UnknownObjectException
 from github.Repository import Repository
+
+from markhub.settings import logger
 
 def get_github_handler(user: User) -> Union[Github, None]:
     """ Get github handler for user
@@ -47,7 +50,9 @@ class GitHubRepository:
                         request.session[repo_name] = self.handler
                         request.session[f'{repo_name}__branches'] = self.branches
                         self.save_current_branch(request, self.handler.default_branch)
+                        logger.info(f"{user.username}/{repo_name} have got from GitHub")
                 except UnknownObjectException as e:
+                    logger.error(f"Repository not found - {e}")
                     raise Http404(f"Repository not found - {e}")
         if self.handler:
             request.session['__current_repo__'] = repo_name
@@ -82,6 +87,7 @@ class GitHubRepository:
         if g:
             repo = g.get_repo(f"{user.username}/{repo}")
             if repo:
+                logger.info(f"{user.username}/{repo} have got from GitHub")
                 return repo
 
     def get_path_parts(self, path: str) -> Dict:
