@@ -73,23 +73,6 @@ class GitHubRepository:
         if self.handler:
             return self.handler.name
     
-    def _get_user_repo(self, user: User, repo: str) -> Union[Repository, None]:
-        """ Get user repo
-        
-        Args: 
-            user: Django User
-            repo: Repository name
-
-        Returns: 
-            Repository object if it exists, otherwise None
-        """
-        g: Github = get_github_handler(user)
-        if g:
-            repo = g.get_repo(f"{user.username}/{repo}")
-            if repo:
-                logger.info(f"{user.username}/{repo} have got from GitHub")
-                return repo
-
     def get_path_parts(self, path: str) -> Dict:
         """ Get path parts dict for path
         
