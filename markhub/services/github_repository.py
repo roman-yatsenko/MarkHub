@@ -10,32 +10,37 @@ from github.Repository import Repository
 
 from markhub.settings import logger
 
-def get_github_handler(user: User) -> Union[Github, None]:
+@logger.catch
+def get_github_handler(user: Union[User, str]) -> Union[Github, None]:
     """ Get github handler for user
 
     Args:
-        user: Django User
+        user: Django User or GitHub user (if str type)
 
     Returns:
         Github object for user if it has a token, otherwise None
     """
-    social_account = user.socialaccount_set
-    if social_account.exists() and social_account.first().provider == 'github':
-        social_login = social_account.first().socialtoken_set
-        if social_login.exists():
-            return Github(social_login.first().token)    
+    if isinstance(user, User):
+        social_account = user.socialaccount_set
+        if social_account.exists() and social_account.first().provider == 'github':
+            social_login = social_account.first().socialtoken_set
+            if social_login.exists():
+                return Github(social_login.first().token)
+    elif isinstance(user, str):
+        return Github(user)
 
 class GitHubRepository:
     """GitHub Repository handler via session"""
 
-    def __init__(self, request: HttpRequest, repo_name: str) -> None:
+    def __init__(self, request: HttpRequest, repo_name: str, github_username: str = '') -> None:
         """ Create Repository object for repo from session or via GitHub request
         
         Args: 
             request: Django request object
             repo_name: Repository name
+            github_username: GitHub username for unathorized view
         """
-        if repo_name in request.session:
+        if not github_username and repo_name in request.session:
             self.handler: Repository =  request.session[repo_name]
             self.branches = request.session[f'{repo_name}__branches']
             self.branch = request.session[f'{repo_name}__current_branch']
