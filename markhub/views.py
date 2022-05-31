@@ -1,5 +1,6 @@
-from email import message
+from pathlib import PurePosixPath
 from typing import Any, Dict
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,11 +11,11 @@ from django.shortcuts import render, redirect
 from django.utils.html import format_html
 from django.views.generic import TemplateView
 
-from pathlib import PurePosixPath
 from github import GithubException, UnknownObjectException
 
 from .forms import NewFileForm, UpdateFileForm
 from .services.github_repository import GitHubRepository, get_github_handler
+from .settings import logger
 
 @login_required
 def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:
@@ -78,6 +79,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         try:
             contents = repository.handler.get_contents(path, ref=repository.branch)
         except UnknownObjectException as e:
+                logger.error(f"Path not found - {e}")
                 raise Http404(f"Path not found - {e}")
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
@@ -139,6 +141,7 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
                 )
             messages.success(request, message)
         except UnknownObjectException as e:
+            logger.error(f"Path not found - {e}")
             raise Http404(f"Path not found - {e}")
         if path:
             return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
@@ -199,9 +202,8 @@ class RepoView(BaseRepoView):
         else:
             try:
                 contents = self.repo.handler.get_dir_contents(self.path, self.branch)
-            except UnknownObjectException as e:
-                raise Http404(f"Path not found - {e}")
-            except GithubException as e:
+            except (UnknownObjectException, GithubException) as e:
+                logger.error(f"Path not found - {e}")
                 raise Http404(f"Path not found - {e}")
             context['path_parts'] = self.repo.get_path_parts(self.path)
         if isinstance(contents, list):
@@ -226,9 +228,11 @@ class FileView(BaseRepoView):
             contents = self.repo.handler.get_contents(self.path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
         except GithubException as e:
+            logger.error(f"File not found - {e}")
             raise Http404(f"File not found - {e}")
         except UnicodeDecodeError as e:
             context['decode_error'] = True
             context['contents'] = f"Unicode decode error during openning {self.path}"
+            logger.error(context['contents'])
         context['html_url'] = contents.html_url
         return context
