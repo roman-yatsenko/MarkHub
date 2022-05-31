@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyMdown Extensions
 - MathJax math rendering
 - Pygments code highlightning
+- Logging with Loguru
  
 ### Changed
 - Home page description
