@@ -236,3 +236,15 @@ class FileView(BaseRepoView):
             logger.error(context['contents'])
         context['html_url'] = contents.html_url
         return context
+
+
+class ShareView(TemplateView):
+    """ Share page view """
+    template_name = 'share.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for share page view"""
+        context = super().get_context_data(**kwargs)
+        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
+            pass
+        return context
