@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load martortags %}
+
+{% block title %}
+  {{ path }} - 
+{% endblock %}
+
+{% block css %}
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if contents %}
+  <div class="mb-3 martor-content border">
+    <div class="martor-preview">
+      {{ contents|safe_markdown }}
+    </div>
+  </div>
+  {% endif %}
+  <hr>
+  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+{% endblock %}

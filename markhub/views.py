@@ -1,5 +1,6 @@
 from pathlib import PurePosixPath
 from typing import Any, Dict
+from urllib.request import urlopen
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -241,10 +242,16 @@ class FileView(BaseRepoView):
 class ShareView(TemplateView):
     """ Share page view """
     template_name = 'share.html'
+    GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{user}/{repo}/{branch}/{path}'
 
+    @logger.catch
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
         context = super().get_context_data(**kwargs)
-        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
-            pass
+        params = ('user', 'repo', 'branch', 'path')
+        logger.debug([context[x] for x in params])
+        # if all(x in context for x in params):
+        #     context['contents'] = urlopen(ShareView.GITHUB_USERCONTENT_TEMPLATE.format(
+        #         *[context[x] for x in params]
+        #     ))
         return context
