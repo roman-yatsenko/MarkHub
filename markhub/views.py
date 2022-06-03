@@ -1,6 +1,8 @@
+from email import message
 from pathlib import PurePosixPath
 from typing import Any, Dict
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -243,15 +245,19 @@ class ShareView(TemplateView):
     """ Share page view """
     template_name = 'share.html'
     GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{user}/{repo}/{branch}/{path}'
+    GITHUB_URL_TEMPLATE = 'https://github.com/{user}/{repo}//blob/{branch}/{path}'
 
-    @logger.catch
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
         context = super().get_context_data(**kwargs)
         params = ('user', 'repo', 'branch', 'path')
-        logger.debug([context[x] for x in params])
-        # if all(x in context for x in params):
-        #     context['contents'] = urlopen(ShareView.GITHUB_USERCONTENT_TEMPLATE.format(
-        #         *[context[x] for x in params]
-        #     ))
+        if all(x in context for x in params):
+            try:
+                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
+                context['contents'] = urlopen(usercontent_url).read().decode('utf-8')
+                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
+            except HTTPError as e:
+                error_message = f"Url not found - {usercontent_url}"
+                logger.error(error_message)
+                raise Http404(error_message)
         return context
