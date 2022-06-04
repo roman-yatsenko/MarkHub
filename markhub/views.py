@@ -257,9 +257,14 @@ class ShareView(TemplateView):
             try:
                 usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
                 context['contents'] = urlopen(usercontent_url).read().decode('utf-8')
-                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
             except HTTPError as e:
                 error_message = f"Url not found - {usercontent_url}"
                 logger.error(error_message)
                 raise Http404(error_message)
+            except UnicodeDecodeError as e:
+                context['decode_error'] = True
+                context['contents'] = f"Unicode decode error during openning {context['path']}"
+                logger.error(context['contents'])
+            finally:
+                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
         return context
