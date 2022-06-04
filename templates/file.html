@@ -29,6 +29,7 @@
   <p>
     <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}">Edit</a> 
     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button> 
+    <a class="btn btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank">Share</a> 
   </p>
   {% endif %}
   <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>

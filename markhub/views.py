@@ -172,6 +172,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
+        self.user_name = request.user.username
         self.repo = GitHubRepository(request, kwargs['repo'])
         self.path = kwargs.get('path', '')
         self.branch = kwargs.get('branch', self.repo.branch)
@@ -179,6 +180,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
         context = super().get_context_data(**kwargs)
+        context['user_name'] = self.user_name
         context['repo'] = self.repo.name
         context['branch'] = self.branch
         context['branches'] = self.repo.branches
