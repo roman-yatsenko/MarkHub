@@ -12,13 +12,19 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 
 from github import GithubException, UnknownObjectException
+from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
 from .services.github_repository import GitHubRepository, get_github_handler
-from .settings import logger
+from .settings import (
+    MARTOR_MARKDOWN_EXTENSIONS,
+    MARTOR_MARKDOWN_EXTENSION_CONFIGS,
+    logger,
+)
 
 @login_required
 def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:
@@ -256,7 +262,9 @@ class ShareView(TemplateView):
         if all(x in context for x in params):
             try:
                 usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
-                context['contents'] = urlopen(usercontent_url).read().decode('utf-8')
+                markdown = self._markdown()
+                context['contents'] = mark_safe(markdown.convert(urlopen(usercontent_url).read().decode('utf-8')))
+                context['toc'] = mark_safe(markdown.toc)
             except HTTPError as e:
                 error_message = f"Url not found - {usercontent_url}"
                 logger.error(error_message)
@@ -268,3 +276,17 @@ class ShareView(TemplateView):
             finally:
                 context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
         return context
+
+    def _markdown(self) -> Markdown:
+        """
+        Rerurn the Markdown object with martor settings
+
+        Returns:
+            Markdown object
+        """
+        return Markdown(
+            extensions=MARTOR_MARKDOWN_EXTENSIONS,
+            extension_configs=MARTOR_MARKDOWN_EXTENSION_CONFIGS,
+            output_format="html5",
+        )
+    
