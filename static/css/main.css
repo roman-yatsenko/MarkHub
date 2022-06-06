@@ -1,0 +1,14 @@
+/* TOC navigation */
+
+.martor-content-toc {
+    font-size: small;
+}
+
+.martor-content-toc ul {
+    list-style-type: none;
+}
+
+.martor-content-toc a {
+    text-decoration: none;
+    color: var(--bs-secondary);
+}
