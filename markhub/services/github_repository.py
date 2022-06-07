@@ -10,6 +10,7 @@ from github.Repository import Repository
 
 from markhub.settings import logger
 
+@logger.catch
 def get_github_handler(user: User) -> Union[Github, None]:
     """ Get github handler for user
 

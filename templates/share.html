@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load martortags %}
+
+{% block title %}
+  {{ path }} - 
+{% endblock %}
+
+{% block css %}
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'css/main.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if contents %}
+  <div class="row mt-3 mb-2">
+    <div class="col-sm-3">
+      <div class="martor-content-toc sticky-top pt-3">
+        {{ toc }}
+      </div>
+    </div>
+    <div class="col-sm-9 martor-content border">
+      <div class="martor-preview">
+        {{ contents }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+{% endblock %}
