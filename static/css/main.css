@@ -13,3 +13,7 @@
     text-decoration: none;
     color: var(--bs-secondary);
 }
+
+.martor-field {
+    height: 60vh;
+}
