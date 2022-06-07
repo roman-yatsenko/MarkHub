@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Unathorized view mode with toc navigation
+- Unauthorized view mode with toc navigation
 - Successful messages for file operations
 - Python-Markdown extensions
 - PyMdown Extensions

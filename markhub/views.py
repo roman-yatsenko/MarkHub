@@ -1,4 +1,3 @@
-from email import message
 from pathlib import PurePosixPath
 from typing import Any, Dict
 from urllib.request import urlopen
