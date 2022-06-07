@@ -6,6 +6,7 @@
 
 .martor-content-toc ul {
     list-style-type: none;
+    padding-left: 1rem;
 }
 
 .martor-content-toc a {
