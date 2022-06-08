@@ -39,6 +39,11 @@
       <a class="btn btn-outline-danger ms-2" href="{% url 'file' repo branch path %}" role="button">Cancel</a>
     </div>
   </form>
+
+  <!-- Back to top button -->
+  <button  type="button"  class="btn btn-danger btn-floating btn-lg"  id="btn-back-to-top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
 </div>
 {% endblock %}
   
@@ -53,4 +58,5 @@
 <script type="text/javascript" src="{% static 'plugins/js/emojis.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'martor/js/martor.bootstrap.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/back-to-top.js' %}" async></script>
 {% endblock %}

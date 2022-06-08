@@ -30,9 +30,14 @@
   </div>
   {% endif %}
   <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+  <!-- Back to top button -->
+  <button  type="button"  class="btn btn-danger btn-floating btn-lg"  id="btn-back-to-top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
 </div>
 {% endblock %}
 
 {% block js %}
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/back-to-top.js' %}" async></script>
 {% endblock %}
