@@ -6,15 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Enlarge editor field
-- Back-to-top button
-- Unauthorized view mode with toc navigation
 - Successful messages for file operations
 - Python-Markdown extensions
 - PyMdown Extensions
 - MathJax math rendering
 - Pygments code highlightning
 - Logging with Loguru
+- Unauthorized view mode with toc navigation
+- Enlarge editor field
+- Back-to-top button
  
 ### Changed
 - Home page description
