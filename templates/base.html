@@ -8,16 +8,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>
-    {% block title %}
-    {% endblock %}
+    {% block title %}{% endblock %}
     MarkHub
   </title>
   <!-- Font Awesome -->
   <link  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"  rel="stylesheet" />
   <!-- Bootstrap from Martor -->
   <link href="{% static 'plugins/css/bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
-  {% block css %}
-  {% endblock %}
+  {% block css %}{% endblock %}
 </head>
 
 <body class="d-flex flex-column justify-content-between vh-100">
