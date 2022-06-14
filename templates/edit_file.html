@@ -12,8 +12,11 @@
   <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'plugins/css/resizable.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
-  <link href="{% static 'css/main.css' %}" type="text/css" media="all" rel="stylesheet" />
-  <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <style>
+  .martor-field {
+      height: 60vh;
+  }
+  </style>
 {% endblock %}
 
 {% block content %}
