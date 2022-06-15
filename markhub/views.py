@@ -192,7 +192,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
         context['path'] = self.path
         if self.path:
             context['path_parts'] = self.repo.get_path_parts(self.path)
-            context['parent_path'] = Path(self.path).parent
+            context['parent_path'] = str(Path(self.path).parent)
         return context
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
