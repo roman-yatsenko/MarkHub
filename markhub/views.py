@@ -1,4 +1,4 @@
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any, Dict
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -189,9 +189,13 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
         context['repo'] = self.repo.name
         context['branch'] = self.branch
         context['branches'] = self.repo.branches
+        context['path'] = self.path
+        if self.path:
+            context['path_parts'] = self.repo.get_path_parts(self.path)
+            context['parent_path'] = str(Path(self.path).parent)
         return context
 
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """POST request handler to change current branch"""
         if request.POST.get('selected_branch', False):
             self.branch = request.POST.get('selected_branch')
@@ -208,14 +212,12 @@ class RepoView(BaseRepoView):
         context = super().get_context_data(**kwargs)
         if not self.path:
             contents = self.repo.handler.get_contents('', self.branch)
-            context['path'] = ''
         else:
             try:
                 contents = self.repo.handler.get_dir_contents(self.path, self.branch)
             except (UnknownObjectException, GithubException) as e:
                 logger.error(f"Path not found - {e}")
                 raise Http404(f"Path not found - {e}")
-            context['path_parts'] = self.repo.get_path_parts(self.path)
         if isinstance(contents, list):
             context['repo_contents'] = contents
             contents.sort(
@@ -226,6 +228,7 @@ class RepoView(BaseRepoView):
         context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
         return context
 
+
 class FileView(BaseRepoView):
     """Repository file view"""
     template_name = 'file.html'
@@ -233,13 +236,16 @@ class FileView(BaseRepoView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for file view"""
         context = super().get_context_data(**kwargs)
-        context['path_parts'] = self.repo.get_path_parts(self.path)
         try:
             contents = self.repo.handler.get_contents(self.path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
         except GithubException as e:
             logger.error(f"File not found - {e}")
-            raise Http404(f"File not found - {e}")
+            raise Http404(
+                "The '{user_name}/{repo}' repository doesn't contain the '{path}' path in '{branch}'.".format(
+                    **context
+                )
+            )
         except UnicodeDecodeError as e:
             context['decode_error'] = True
             context['contents'] = f"Unicode decode error during openning {self.path}"

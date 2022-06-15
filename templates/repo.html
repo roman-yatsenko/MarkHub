@@ -8,8 +8,17 @@
 
 {% block content %}
 <div class="container">
-  {% include "branch_path_form.html" %}
+  {% include "components/branch_path_form.html" %}
   <div class="list-group">
+    {% if parent_path %}
+    <li class="list-group-item list-group-item-action">
+      {% if parent_path != "." %}
+        <a href ="{% url 'repo' repo branch parent_path %}" class="text-decoration-none">..</a>
+      {% else %}
+        <a href ="{% url 'repo' repo %}" class="text-decoration-none">..</a>
+      {% endif %}
+    </li>
+    {% endif %}
     {% for content in repo_contents %}
     <li class="list-group-item list-group-item-action">
       {% if content.type == "dir"%}

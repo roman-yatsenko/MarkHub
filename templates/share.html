@@ -9,8 +9,6 @@
 
 {% block css %}
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
-  <link href="{% static 'css/main.css' %}" type="text/css" media="all" rel="stylesheet" />
-  <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -30,14 +28,10 @@
   </div>
   {% endif %}
   <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
-  <!-- Back to top button -->
-  <button  type="button"  class="btn btn-danger btn-floating btn-lg"  id="btn-back-to-top">
-    <i class="fas fa-arrow-up"></i>
-  </button>
+  {% include "components/back-to-top.html" %}
 </div>
 {% endblock %}
 
 {% block js %}
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
-<script type="text/javascript" src="{% static 'js/back-to-top.js' %}" async></script>
 {% endblock %}

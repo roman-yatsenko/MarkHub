@@ -12,12 +12,11 @@
 {% block css %}
   <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
-  <link href="{% static 'css/markdown-extensions.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
 <div class="container">
-  {% include "branch_path_form.html" %}
+  {% include "components/branch_path_form.html" %}
   {% if contents %}
   <div class="mb-3 martor-content border">
     <div class="martor-preview">
@@ -33,6 +32,7 @@
   </p>
   {% endif %}
   <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+  {% include "components/back-to-top.html" %}
 </div>
   
 <!-- The Modal -->
@@ -59,6 +59,7 @@
     </div>
   </div>
 </div>
+
 {% endblock %}
 
 {% block js %}
