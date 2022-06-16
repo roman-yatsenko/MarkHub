@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
-
+- Disable non-owner repo access
 ### Security
 
 ## [0.1.0] - 2022-03-09
