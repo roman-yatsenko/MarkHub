@@ -1,4 +1,4 @@
-from .django import BASE_DIR
+from .django import BASE_DIR, env
 
 from markdown.extensions.toc import slugify_unicode
 from pymdownx import emoji
@@ -33,28 +33,8 @@ MARTOR_TOOLBAR_BUTTONS = [
 MARTOR_ENABLE_LABEL = False
 
 # Imgur API Keys
-# MARTOR_IMGUR_CLIENT_ID = 'your-client-id'
-# MARTOR_IMGUR_API_KEY   = 'your-api-key'
-
-# Upload to locale storage
-import time
-MARTOR_UPLOAD_PATH = 'images/uploads/{}'.format(time.strftime("%Y/%m/%d/"))
-MARTOR_UPLOAD_URL = '/martor/uploader/'  # change to local uploader
-
-# Maximum Upload Image
-# 2.5MB - 2621440
-# 5MB - 5242880
-# 10MB - 10485760
-# 20MB - 20971520
-# 50MB - 5242880
-# 100MB 104857600
-# 250MB - 214958080
-# 500MB - 429916160
-MAX_IMAGE_UPLOAD_SIZE = 2621440  # 2.5MB
-
-# Media Path
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MARTOR_IMGUR_CLIENT_ID = env('IMGUR_CLIENT_ID')
+MARTOR_IMGUR_API_KEY   = env('IMGUR_API_KEY')
 
 # Markdownify
 MARTOR_MARKDOWNIFY_FUNCTION = 'martor.utils.markdownify' # default
@@ -129,6 +109,7 @@ MARTOR_UPLOAD_URL = '/martor/uploader/' # default
 MARTOR_SEARCH_USERS_URL = '/martor/search-user/' # default
 
 # Markdown Extensions
+
 # MARTOR_MARKDOWN_BASE_EMOJI_URL = 'https://www.webfx.com/tools/emoji-cheat-sheet/graphics/emojis/'     # from webfx
 MARTOR_MARKDOWN_BASE_EMOJI_URL = 'https://github.githubassets.com/images/icons/emoji/'                  # default from github
 MARTOR_MARKDOWN_BASE_MENTION_URL = 'https://markhub.io/author/'                                      # please change this to your domain
@@ -147,3 +128,25 @@ ALLOWED_URL_SCHEMES = [
 
 # Check this setting is not set else csrf will not be sent over ajax calls:
 CSRF_COOKIE_HTTPONLY = False
+
+# Upload to locale storage
+# See at https://github.com/agusmakmun/django-markdown-editor/wiki
+
+# import time
+# MARTOR_UPLOAD_PATH = 'images/uploads/{}'.format(time.strftime("%Y/%m/%d/"))
+# MARTOR_UPLOAD_URL = '/martor/uploader/'  # change to local uploader
+
+# Maximum Upload Image
+# 2.5MB - 2621440
+# 5MB - 5242880
+# 10MB - 10485760
+# 20MB - 20971520
+# 50MB - 5242880
+# 100MB 104857600
+# 250MB - 214958080
+# 500MB - 429916160
+MAX_IMAGE_UPLOAD_SIZE = 5242880  # 5MB
+
+# Media Path
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
