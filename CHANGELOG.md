@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enlarge editor field
 - Back-to-top button
 - Parent folder link
+- Imgur image uploading
  
 ### Changed
 - Home page description
