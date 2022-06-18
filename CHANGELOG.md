@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Back-to-top button
 - Parent folder link
 - Imgur image uploading
+- Add 404 page
  
 ### Changed
 - Home page description
