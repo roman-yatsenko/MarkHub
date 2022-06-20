@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,9 +40,15 @@
           <ul class="ms-auto navbar-nav">
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Profile
+                {{ user.username }}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% get_social_accounts user as accounts %}
+                {% if accounts.github %}
+                  <a class="dropdown-item" href="https://github.com/{{accounts.github.0}}" target="_blank">
+                    GitHub profile
+                  </a>
+                {% endif %}
                 <a class="dropdown-item" href="{% url 'account_logout' %}">Sign Out</a>
               </div>
             </li>
