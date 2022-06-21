@@ -12,7 +12,7 @@
   
 {% block content %}
   {% if user.is_authenticated %}
-  <div class="container mt-2 mb-2">
+  <div class="container my-2">
     <h2>Welcome {{ user.username }} !</h2>
     <p>Your repositories:</p>
     <div class="list-group">
@@ -27,7 +27,11 @@
       <img src="{% static 'img/logo.png' %}" class="w-50 mx-auto d-block" alt="MarkHub logo">
       <p class="display-6">Markdown editor for your GitHub repositories</p>
       <div class="mt-5">
-        <a class="btn btn-success btn-lg" href="{% provider_login_url 'github' %}">Sign Up</a>
+        <a class="btn btn-success btn-lg" href="{% provider_login_url 'github' %}" 
+            title="Sign in with your GitHub account">
+          <i class="bi-github"></i>
+          Sign In
+        </a>
       </div>
     </div>
   </div>
