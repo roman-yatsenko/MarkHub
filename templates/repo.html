@@ -23,10 +23,10 @@
     <li class="list-group-item list-group-item-action">
       {% if content.type == "dir"%}
         <a href ="{% url 'repo' repo branch content.path %}" class="text-decoration-none" title="Open folder">
-          <i class="bi-folder"></i>  
+          <i class="bi-folder-fill"></i>  
       {% else %}
         <a href ="{% url 'file' repo branch content.path %}" class="text-decoration-none" title="Open file">
-          <i class="bi-file-earmark"></i>  
+          <i class="bi-file-text"></i>  
       {% endif %}
           {{ content.name }}
         </a>
@@ -41,7 +41,7 @@
       {% else %}
         href="{% url 'new-file' repo %}"
       {% endif %}>
-      <i class="bi-file"></i> 
+      <i class="bi-file-plus"></i> 
       New file
     </a>
   </p>

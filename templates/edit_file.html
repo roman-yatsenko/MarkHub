@@ -31,15 +31,17 @@
       {{ form.content }}
     </div>
     <div class="form-group mb-2 d-flex justify-content-end">
-      <button type="submit" class="btn btn-success">
-        <i class="save icon"></i>
-        {% if update %}
-        Update
-        {% else %}
-        Create
-        {% endif %}
+      {% if update %}
+      <button type="submit" class="btn btn-success" title="Update file">
+        <i class="bi bi-check-square"></i> Update
+      {% else %}
+      <button type="submit" class="btn btn-success" title="Create file">
+        <i class="bi bi-file-plus"></i> Create
+      {% endif %}
       </button>
-      <a class="btn btn-outline-danger ms-2" href="{% url 'file' repo branch path %}" role="button">Cancel</a>
+      <a class="btn btn-outline-danger ms-2" href="{% url 'file' repo branch path %}" role="button" 
+          title="Cancel changes">
+          <i class="bi bi-x-square"></i> Cancel</a>
     </div>
   </form>
 

@@ -27,7 +27,10 @@
     </div>
   </div>
   {% endif %}
-  <p><a href="{{ html_url }}" target="_blank">Open in the GitHub</a></p>
+  <p>
+    <a href="{{ html_url }}" target="_blank" title="Open file in the GitHub">Open in the GitHub</a>
+    <i class="bi-box-arrow-up-right"></i>
+  </p>
   {% include "components/back-to-top.html" %}
 </div>
 {% endblock %}
