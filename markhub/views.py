@@ -37,32 +37,41 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     Returns:
         rendered page
     """
-    if request.method == 'POST':
-        new_file_form = NewFileForm(request.POST)
-        if new_file_form.is_valid() and (repository := GitHubRepository(request, repo)):
-            filename: str = new_file_form.cleaned_data["filename"]
-            newfile_path: str = f'{path + "/" if path else ""}{filename}' 
-            status: dict = repository.handler.create_file(
-                path=newfile_path, 
-                message=f"Add {filename} at MarkHub", 
-                content=new_file_form.cleaned_data['content'], 
-                branch=repository.branch)
-            message: str = format_html(
-                'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
-                newfile_path,
-                status["commit"].html_url,
-                status["commit"].sha[:7]
-            )
-            messages.success(request, message)
-            return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
+    if repository := GitHubRepository(request, repo):
+        context = {
+            'title': 'New file in',
+            'repo': repository.name,
+            'branch': repository.branch,
+            'path': path,
+        }
+        if request.method == 'POST':
+            new_file_form = NewFileForm(request.POST)
+            if new_file_form.is_valid():
+                filename: str = new_file_form.cleaned_data["filename"]
+                newfile_path: str = f'{path + "/" if path else ""}{filename}'
+                try: 
+                    status: dict = repository.handler.create_file(
+                        path=newfile_path, 
+                        message=f"Add {filename} at MarkHub", 
+                        content=new_file_form.cleaned_data['content'], 
+                        branch=repository.branch)
+                except UnknownObjectException as e:
+                    logger.error(f"File not created - {e}")
+                    raise Http404(f"File not created - {e}")
+                message: str = format_html(
+                    'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
+                    newfile_path,
+                    status["commit"].html_url,
+                    status["commit"].sha[:7]
+                )
+                messages.success(request, message)
+                return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
+        else:
+            new_file_form = NewFileForm()
+        context['form'] = new_file_form
+        return render(request, 'edit_file.html', context)
     else:
-        new_file_form = NewFileForm()
-    context = {
-        'form': new_file_form,
-        'title': 'New file in'
-    }
-    return render(request, 'edit_file.html', context)
-    
+        raise Http404("Repository not found")
 
 @login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:

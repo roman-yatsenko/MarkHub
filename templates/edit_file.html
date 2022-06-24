@@ -39,9 +39,19 @@
         <i class="bi bi-file-plus"></i> Create
       {% endif %}
       </button>
-      <a class="btn btn-outline-danger ms-2" href="{% url 'file' repo branch path %}" role="button" 
-          title="Cancel changes">
-          <i class="bi bi-x-square"></i> Cancel</a>
+      <a class="btn btn-outline-danger ms-2" role="button" 
+          title="Cancel changes"
+        {% if update %}
+          href="{% url 'file' repo branch path %}"
+        {% else %}
+          {% if path %}
+            href="{% url 'repo' repo branch path %}"
+          {% else %}
+            href="{% url 'repo' repo %}"
+          {% endif %}
+        {% endif %}
+      >
+        <i class="bi bi-x-square"></i> Cancel</a>
     </div>
   </form>
 
