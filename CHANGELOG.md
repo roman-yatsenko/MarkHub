@@ -17,20 +17,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Back-to-top button
 - Parent folder link
 - Imgur image uploading
-- Add 404 page
+- 404 page
+- favicon
+- Bootstrap icons
+- UI titles
  
 ### Changed
 - Home page description
 - Settings stucture
 - Context preparing in class views
 - Refactor views with components
+- Header, footer colors
 
 ### Deprecated
 
 ### Removed
+- Font Awesome
 
 ### Fixed
 - Disable non-owner repo access
+- New-file bug
 ### Security
 
 ## [0.1.0] - 2022-03-09
