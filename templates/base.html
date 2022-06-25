@@ -65,7 +65,7 @@
         {% if messages %}
           <div class="messages m-2">
             {% for message in messages %}
-              <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible">
+              <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible text-center">
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 {{ message }}
               </div>
