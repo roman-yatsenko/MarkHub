@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('martor/', include('martor.urls')),
+    re_path(r'^file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/$', FileView.as_view(), name='base'),
     re_path(r'^file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.+)/$', FileView.as_view(), name='file'),
     re_path(r'^delete-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', delete_file_ctr, name='delete-file'),
     re_path(r'^new-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', new_file_ctr, name='new-file'),
