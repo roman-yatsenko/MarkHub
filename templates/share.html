@@ -7,6 +7,10 @@
   {{ path }} - 
 {% endblock %}
 
+{% block baseurl %}
+  <base href="{% url 'share-base' user repo branch %}" target="_blank">
+{% endblock  %}
+
 {% block css %}
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
@@ -20,17 +24,17 @@
         {{ toc }}
       </div>
     </div>
-    <div class="col-sm-9 martor-content border">
-      <div class="martor-preview">
+    <div class="col-sm-9 martor-content">
+      <div class="martor-preview border">
         {{ contents }}
       </div>
+      <p class="mt-2">
+        <a href="{{ html_url }}" target="_blank" title="Open file in the GitHub">Open in the GitHub</a>
+        <i class="bi-box-arrow-up-right"></i>
+      </p>
     </div>
   </div>
   {% endif %}
-  <p>
-    <a href="{{ html_url }}" target="_blank" title="Open file in the GitHub">Open in the GitHub</a>
-    <i class="bi-box-arrow-up-right"></i>
-  </p>
   {% include "components/back-to-top.html" %}
 </div>
 {% endblock %}

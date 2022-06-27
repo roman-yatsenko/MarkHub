@@ -21,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - favicon
 - Bootstrap icons
 - UI titles
- 
+- baseurl to templates
+
 ### Changed
 - Home page description
 - Settings stucture

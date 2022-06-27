@@ -21,7 +21,7 @@
 
 {% block content %}
 <div class="container">
-  <form method="post">
+  <form method="post" target="_self">
     {% csrf_token %}
     <div class="mb-3 mt-3">
       <label for="email" class="form-label">File name:</label>
@@ -40,7 +40,7 @@
       {% endif %}
       </button>
       <a class="btn btn-outline-danger ms-2" role="button" 
-          title="Cancel changes"
+          title="Cancel changes" target="_self"
         {% if update %}
           href="{% url 'file' repo branch path %}"
         {% else %}
