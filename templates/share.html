@@ -7,6 +7,10 @@
   {{ path }} - 
 {% endblock %}
 
+{% block baseurl %}
+  <base href="{% url 'share-base' user repo branch %}" target="_blank">
+{% endblock  %}
+
 {% block css %}
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}

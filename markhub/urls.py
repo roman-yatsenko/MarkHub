@@ -33,6 +33,8 @@ urlpatterns = [
     re_path(r'^repo/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.*)/$', RepoView.as_view(), name='repo'),
     re_path(r'^repo/(?P<repo>[-a-zA-Z0-9_\.]+)/$', RepoView.as_view(), name='repo'),
     re_path(r'^update-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', update_file_ctr, name='update-file'),
+    re_path(r'^view/(?P<user>[-a-zA-Z0-9_\.]+)/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/$', 
+            ShareView.as_view(), name='share-base'),
     re_path(r'^view/(?P<user>[-a-zA-Z0-9_\.]+)/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.+)/$', 
             ShareView.as_view(), name='share'),
     path('', HomeView.as_view(), name='home'),
