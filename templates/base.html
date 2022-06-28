@@ -13,10 +13,17 @@
     <base href="{% url 'base' repo branch %}" target="_blank">
     {% endif %}
   {% endblock  %}
+
   <title>
     {% block title %}{% endblock %}
     MarkHub
   </title>
+  <meta name="description" content="Markdown editor for your GitHub repositories">
+  <meta name="robots" content="index,follow">
+  <meta name="googlebot" content="index,follow">
+  <meta name="google" content="nositelinkssearchbox">
+  <meta name="google" content="notranslate">
+  
   <link rel="shortcut icon" href="{% static 'img/short-logo.png' %}" type="image/x-icon">
   <!-- Bootstrap from Martor -->
   <link href="{% static 'plugins/css/bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
