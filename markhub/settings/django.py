@@ -159,3 +159,10 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
     
+# Site admins
+
+ADMIN = [
+    ('YaRo', 'yatsenkoroma@gmail.com'),
+]
+
+SERVER_EMAIL = 'info@markhub.io'
