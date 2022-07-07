@@ -149,3 +149,11 @@ STATIC_ROOT = BASE_DIR / "dist" / "static"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# HSTS policy
+
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 2_592_000  # Unit is seconds; *USE A SMALL VALUE (30) FOR TESTING!*
+    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
