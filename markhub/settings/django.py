@@ -150,10 +150,12 @@ STATIC_ROOT = BASE_DIR / "dist" / "static"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# HSTS policy
+# HSTS policy & Referrer-Policy
 
 if not DEBUG:
     SECURE_HSTS_SECONDS = 2_592_000  # Unit is seconds; *USE A SMALL VALUE (30) FOR TESTING!*
     SECURE_HSTS_PRELOAD = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+    
