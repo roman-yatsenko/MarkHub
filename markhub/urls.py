@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 
 from .views import HomeView, RepoView, FileView, ShareView
-from .views import new_file_ctr, update_file_ctr, delete_file_ctr
+from .views import new_file_ctr, update_file_ctr, delete_file_ctr, get_webmanifest
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,4 +41,5 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    urlpatterns.append(path('manifest.webmanifest', get_webmanifest))
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
