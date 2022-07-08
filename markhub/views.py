@@ -6,7 +6,7 @@ from urllib.error import HTTPError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
+from django.http import Http404, FileResponse
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
@@ -24,6 +24,18 @@ from .settings import (
     MARTOR_MARKDOWN_EXTENSION_CONFIGS,
     logger,
 )
+
+def get_webmanifest(request: HttpRequest) -> FileResponse:
+    """ _Get webmanifest file in the DEBUG mode_
+
+    Args:
+        request (HttpRequest): _request object_
+
+    Returns:
+        FileResponse: _webmanifest as FileResponse_
+    """
+    return FileResponse(open('manifest.webmanifest', 'rb'))
+
 
 @login_required
 def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:

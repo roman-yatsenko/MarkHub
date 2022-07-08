@@ -13,11 +13,24 @@
     <base href="{% url 'base' repo branch %}" target="_blank">
     {% endif %}
   {% endblock  %}
+
   <title>
     {% block title %}{% endblock %}
     MarkHub
   </title>
-  <link rel="shortcut icon" href="{% static 'img/short-logo.png' %}" type="image/x-icon">
+  <meta name="description" content="Markdown editor for your GitHub repositories">
+  <meta name="robots" content="index,follow">
+  <meta name="googlebot" content="index,follow">
+  <meta name="google" content="nositelinkssearchbox">
+  <meta name="google" content="notranslate">
+
+  <!-- favicon set -->
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="any"><!-- 32×32 -->
+  <link rel="icon" href="{% static 'img/icon.png' %}" type="image/png">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}"><!-- 180×180 -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  
+  {% comment %} <link rel="shortcut icon" href="{% static 'img/short-logo.png' %}" type="image/png" width='16' height='16'> {% endcomment %}
   <!-- Bootstrap from Martor -->
   <link href="{% static 'plugins/css/bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <!-- Bootstrap icons -->
@@ -93,5 +106,15 @@
   <script type="text/javascript" src="{% static 'plugins/js/bootstrap.min.js' %}"></script>
   {% block js %}{% endblock %}
   
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YLT46XSKZC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-YLT46XSKZC');
+  </script>
+
 </body>
 </html>
