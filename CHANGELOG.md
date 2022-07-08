@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+### Changed
+- Home page description
+- Settings stucture
+- Context preparing in class views
+- Refactor views with components
+- Header, footer colors
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.2.0] - 2022-07-08
+### Added
 - Successful messages for file operations
 - Python-Markdown extensions
 - PyMdown Extensions
@@ -22,7 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap icons
 - UI titles
 - baseurl to templates
-
+- meta tags
+- Google Analytics
+- favicon set
+- webmanifest
+- gunicorn
+- Production secure policies
 ### Changed
 - Home page description
 - Settings stucture
@@ -30,15 +53,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor views with components
 - Header, footer colors
 
-### Deprecated
-
 ### Removed
 - Font Awesome
 
 ### Fixed
 - Disable non-owner repo access
 - New-file bug
-### Security
 
 ## [0.1.0] - 2022-03-09
 ### Added

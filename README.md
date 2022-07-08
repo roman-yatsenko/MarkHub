@@ -12,6 +12,9 @@ Markdown content development service for your GitHub repositories
     ```text
     DEBUG=True
     SECRET_KEY=<any_symbols>
+    ALLOWED_HOSTS=127.0.0.1
+    IMGUR_CLIENT_ID=<imgur_client_id>
+    IMGUR_API_KEY=<imgur_api_key>
     ```
 
 5. Run in the project folder:
