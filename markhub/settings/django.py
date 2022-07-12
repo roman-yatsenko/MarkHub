@@ -37,7 +37,7 @@ SECRET_KEY = env('SECRET_KEY')
 # False if not in os.environ because of casting above
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = [] if DEBUG else [env('ALLOWED_HOSTS')]
+ALLOWED_HOSTS = [] if DEBUG else env('ALLOWED_HOSTS').split(',')
 
 
 # Application definition

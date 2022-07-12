@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Media files
-/media
+media/
