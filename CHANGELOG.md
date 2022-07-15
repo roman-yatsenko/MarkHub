@@ -8,11 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
-- Home page description
-- Settings stucture
-- Context preparing in class views
-- Refactor views with components
-- Header, footer colors
 
 ### Deprecated
 
