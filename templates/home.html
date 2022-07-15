@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% load socialaccount %}
+
+
+{% block title %}
+  {% if user.is_authenticated %}
+    Repositories - 
+  {% endif %}
+{% endblock %}
+  
+  
+{% block content %}
+  {% if user.is_authenticated %}
+  <div class="container my-2">
+    <h2>Welcome {{ user.username }} !</h2>
+    <p>Your repositories:</p>
+    <div class="list-group">
+      {% for repo in repos %}
+      <a href="{% url 'repo' repo.0 %}" class="list-group-item list-group-item-action" title="Open repository">
+        <i class="bi-folder"></i>
+        {{ repo.0 }}
+        <br><small>Created at {{ repo.1|date:"SHORT_DATE_FORMAT" }}</small>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="mt-4 mx-2 p-5 bg-secondary text-white text-center rounded">
+      <img src="{% static 'img/logo.png' %}" class="w-50 mx-auto d-block" alt="MarkHub logo">
+      <p class="display-6">Markdown editor for your GitHub repositories</p>
+      <div class="mt-5">
+        <a class="btn btn-success btn-lg" href="{% provider_login_url 'github' %}" 
+            title="Sign in with your GitHub account">
+          <i class="bi-github"></i>
+          Sign In
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,64 @@
+<ul class="nav mt-3 gap-2">
+  <li class="nav-item mt-1">
+    <i class="bi bi-git"></i>
+  </li>
+  <li class="nav-item" title="Select branch">
+    <form method="POST">
+      {% csrf_token %}
+      <select class="form-select form-select-sm" id="branch_selector" name="selected_branch" 
+          onchange="this.form.submit();">
+        {% for item in branches %}
+          {% if item == branch %}
+            <option value='{{item}}' selected>
+          {% else %}
+            <option value='{{item}}'>
+          {% endif %}
+              {{item}}
+            </option>
+        {% endfor %}
+      </select>
+    </form>
+  </li>
+  <li class="nav-item mt-1 ms-2">
+    <i class="bi bi-journal-bookmark"></i>
+  </li>
+  <li class="nav-item" title="Open the parent folder">
+    <ul class="breadcrumb border rounded p-1">
+      <li class="breadcrumb-item">
+        <a href="{% url 'repo' repo %}">{{ repo }}</a> 
+      </li>
+      {% if path_parts %}
+        {% for key, value in path_parts.items %}
+          {% if not forloop.last %}
+            <li class="breadcrumb-item">
+              <a href="{% url 'repo' repo branch value %}">{{ key }}</a>
+            </li>
+          {% else %}
+            <li class="breadcrumb-item active">
+              {{ key }}
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </li>
+  {% if not decode_error and contents %}
+  <li class="nav-item ms-2">
+    <a class="btn btn-sm btn-outline-primary" href="{% url 'update-file' repo path %}"  title="Edit file">
+      <i class="bi bi-pencil"></i> Edit
+    </a> 
+  </li>
+  <li class="nav-item">
+    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+        title="Delete file">
+      <i class="bi bi-trash"></i> Delete
+    </button> 
+  </li>
+  <li class="nav-item">
+    <a class="btn btn-sm btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank" 
+        title="Share file">
+      <i class="bi bi-share"></i> Share
+    </a> 
+  </li>
+  {% endif %}
+</ul>

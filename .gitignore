@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Media files
+media/
+
+# VS Code files
+.vscode/

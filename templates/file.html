@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load martortags %}
+
+{% block baseurl %}
+  <base href="{% url 'file' repo branch path %}">
+{% endblock  %}
+
+{% block title %}
+  {% if user.is_authenticated %}
+    {{ path }} - 
+  {% endif %}
+{% endblock %}
+
+{% block css %}
+  <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% include "components/branch_path_form.html" %}
+  {% if contents %}
+  <div class="mb-3 martor-content border">
+    <div class="martor-preview">
+      {{ contents|safe_markdown }}
+    </div>
+  </div>
+  {% endif %}
+  {% if not decode_error %}
+  <p>
+    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}" title="Edit file">
+      <i class="bi bi-pencil"></i> Edit
+    </a> 
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"     
+        title="Delete file">
+        <i class="bi bi-trash"></i> Delete
+    </button> 
+    <a class="btn btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank" 
+        title="Share file">
+      <i class="bi bi-share"></i> Share
+    </a> 
+  </p>
+  {% endif %}
+  <p>
+    <a href="{{ html_url }}" target="_blank" title="Open file in the GitHub">Open in the GitHub</a>
+    <i class="bi-box-arrow-up-right"></i>
+  </p>
+  {% include "components/back-to-top.html" %}
+</div>
+  
+<!-- The Modal -->
+<div class="modal" id="deleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Delete File</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+        Are you sure you want to delete <em>{{ path }}</em> ?
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" 
+            onclick="location.href='{% url 'delete-file' repo path %}'">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+{% endblock %}

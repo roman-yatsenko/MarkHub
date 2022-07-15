@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load martortags %}
+
+{% block baseurl %}
+  <base href="{% url 'share' user repo branch path %}">
+{% endblock  %}
+
+
+{% block title %}
+  {{ path }} - 
+{% endblock %}
+
+{% block css %}
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% if contents %}
+  <div class="row mt-3 mb-2">
+    <div class="col-sm-3">
+      <div class="martor-content-toc sticky-top pt-3">
+        {{ toc }}
+      </div>
+    </div>
+    <div class="col-sm-9 martor-content">
+      <div class="martor-preview border">
+        {{ contents }}
+      </div>
+      <p class="mt-2">
+        <a href="{{ html_url }}" target="_blank" title="Open file in the GitHub">Open in the GitHub</a>
+        <i class="bi-box-arrow-up-right"></i>
+      </p>
+    </div>
+  </div>
+  {% endif %}
+  {% include "components/back-to-top.html" %}
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+{% endblock %}
