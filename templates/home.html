@@ -17,8 +17,7 @@
     <p>Your repositories:</p>
     <div class="list-group">
       {% for repo in repos %}
-      <a href="{% url 'repo' repo.0 %}" class="list-group-item list-group-item-action" title="Open repository" 
-          target="_self">
+      <a href="{% url 'repo' repo.0 %}" class="list-group-item list-group-item-action" title="Open repository">
         <i class="bi-folder"></i>
         {{ repo.0 }}
         <br><small>Created at {{ repo.1|date:"SHORT_DATE_FORMAT" }}</small>
@@ -31,7 +30,7 @@
       <p class="display-6">Markdown editor for your GitHub repositories</p>
       <div class="mt-5">
         <a class="btn btn-success btn-lg" href="{% provider_login_url 'github' %}" 
-            title="Sign in with your GitHub account" target="_self">
+            title="Sign in with your GitHub account">
           <i class="bi-github"></i>
           Sign In
         </a>

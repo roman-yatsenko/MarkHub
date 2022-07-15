@@ -9,14 +9,14 @@
       
       <p>Are you sure you want to sign out?</p>
       
-      <form method="post" action="{% url 'account_logout' %}" target="_self">
+      <form method="post" action="{% url 'account_logout' %}">
         {% csrf_token %}
         {% if redirect_field_value %}
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
         {% endif %}
         <p>
           <button class="btn btn-danger" type="submit">Sign Out</button>
-          <a class="btn btn-outline-secondary" onclick="history.back();" target="_self">Cancel</a>
+          <a class="btn btn-outline-secondary" onclick="history.back();">Cancel</a>
         </p>
       </form>
       
