@@ -3,6 +3,10 @@
 {% load static %}
 {% load martortags %}
 
+{% block baseurl %}
+    <base href="{% url 'file' repo branch path %}">
+  {% endblock  %}
+
 {% block title %}
   {% if user.is_authenticated %}
     {{ path }} - 

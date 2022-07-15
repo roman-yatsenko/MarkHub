@@ -68,6 +68,8 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.tilde',
 
     # Custom markdown extensions.
+    'markdown_link_attr_modifier',
+
     # 'martor.extensions.urlize',
     # 'martor.extensions.del_ins',      # ~~strikethrough~~ and ++underscores++
     # 'martor.extensions.mention',      # to parse markdown mention
@@ -101,6 +103,11 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
     'pymdownx.magiclink': {
         'repo_url_shortener': True,
         'repo_url_shorthand': True,
+    },
+    'markdown_link_attr_modifier': {
+        'new_tab': 'external_only',
+        'no_referrer': 'external_only',
+        'auto_title': 'on',
     },
 }
 
