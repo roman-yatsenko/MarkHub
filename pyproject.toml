@@ -16,6 +16,7 @@ pymdown-extensions = "~9.4"
 Pygments = "~2.12.0"
 loguru = "~0.6.0"
 gunicorn = "~20.1"
+markdown-link-attr-modifier = "~0.2.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -5,14 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
 ### Added
 
 ### Changed
-- Home page description
-- Settings stucture
-- Context preparing in class views
-- Refactor views with components
-- Header, footer colors
 
 ### Deprecated
 
@@ -22,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## [0.2.0] - 2022-07-08
+## [0.2.0] - 2022-07-15
 ### Added
 - Successful messages for file operations
 - Python-Markdown extensions
@@ -46,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webmanifest
 - gunicorn
 - Production secure policies
+- markdown-link-attr-modifier extension
+
 ### Changed
 - Home page description
 - Settings stucture

@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block baseurl %}
+  <base href="{% url 'update-file' repo path %}">
+{% endblock  %}
+
 {% block title %}
   {% if user.is_authenticated %}
     {{ title }} {{ path }} - 
@@ -21,7 +25,7 @@
 
 {% block content %}
 <div class="container">
-  <form method="post" target="_self">
+  <form method="post">
     {% csrf_token %}
     <div class="mb-3 mt-3">
       <label for="email" class="form-label">File name:</label>
@@ -40,7 +44,7 @@
       {% endif %}
       </button>
       <a class="btn btn-outline-danger ms-2" role="button" 
-          title="Cancel changes" target="_self"
+          title="Cancel changes"
         {% if update %}
           href="{% url 'file' repo branch path %}"
         {% else %}
