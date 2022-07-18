@@ -3,8 +3,14 @@
 {% load static %}
 
 {% block baseurl %}
-  <base href="{% url 'update-file' repo path %}">
-{% endblock  %}
+  {% if update %}
+    <base href="{% url 'update-file' repo path %}">
+  {% elif path %}
+    <base href="{% url 'new-file' repo path %}">
+  {% else %}
+    <base href="{% url 'new-file' repo %}">
+  {% endif %}
+{% endblock %}
 
 {% block title %}
   {% if user.is_authenticated %}
@@ -17,9 +23,9 @@
   <link href="{% static 'plugins/css/resizable.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
   <style>
-  .martor-field {
-      height: 60vh;
-  }
+    .martor-field {
+        height: 60vh;
+    }
   </style>
 {% endblock %}
 
