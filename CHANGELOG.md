@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- update dependencies
 
 ### Deprecated
 
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+- add SOCIALACCOUNT_LOGIN_ON_GET=True to django-allauth config
 
 ## [0.2.1] - 2022-07-18
 ### Fixed
