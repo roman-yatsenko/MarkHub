@@ -4,7 +4,7 @@
 {% load martortags %}
 
 {% block baseurl %}
-  <base href="{% url 'share' user repo branch path %}">
+  <base href="{% url 'share-base' user repo branch %}">
 {% endblock  %}
 
 
@@ -42,4 +42,5 @@
 
 {% block js %}
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/anchor-links.js' %}" async></script>
 {% endblock %}

@@ -3,10 +3,6 @@
 {% load static %}
 {% load martortags %}
 
-{% block baseurl %}
-  <base href="{% url 'file' repo branch path %}">
-{% endblock  %}
-
 {% block title %}
   {% if user.is_authenticated %}
     {{ path }} - 
@@ -79,4 +75,5 @@
 
 {% block js %}
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/anchor-links.js' %}" async></script>
 {% endblock %}

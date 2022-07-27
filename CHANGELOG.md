@@ -5,7 +5,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
 ### Added
 
 ### Changed
@@ -17,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [0.2.2] - 2022-07-27
+### Added
+- profile menu icon
+- processing repository and anchor links in rendered markdown
+
+### Changed
+- update dependencies
+- enlarge editor font size
+
+### Security
+- add SOCIALACCOUNT_LOGIN_ON_GET=True to django-allauth config
 
 ## [0.2.1] - 2022-07-18
 ### Fixed

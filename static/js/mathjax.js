@@ -21,8 +21,6 @@ window.MathJax = {
 let preview = document.getElementById("nav-preview-tab-content");
 if (preview) {
   preview.onclick = () => {
-    console.log('Preview clicked');
     setTimeout(MathJax.typeset, 1000);
-    // MathJax.typeset();
   }
 }

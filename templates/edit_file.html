@@ -2,16 +2,6 @@
 
 {% load static %}
 
-{% block baseurl %}
-  {% if update %}
-    <base href="{% url 'update-file' repo path %}">
-  {% elif path %}
-    <base href="{% url 'new-file' repo path %}">
-  {% else %}
-    <base href="{% url 'new-file' repo %}">
-  {% endif %}
-{% endblock %}
-
 {% block title %}
   {% if user.is_authenticated %}
     {{ title }} {{ path }} - 
@@ -25,6 +15,9 @@
   <style>
     .martor-field {
         height: 60vh;
+    }
+    .ace_editor {
+        font-size: 14px !important;
     }
   </style>
 {% endblock %}
@@ -84,4 +77,5 @@
 <script type="text/javascript" src="{% static 'martor/js/martor.bootstrap.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
 <script type="text/javascript" src="{% static 'js/back-to-top.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/anchor-links.js' %}" async></script>
 {% endblock %}

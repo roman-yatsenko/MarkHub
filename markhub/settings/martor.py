@@ -105,7 +105,7 @@ MARTOR_MARKDOWN_EXTENSION_CONFIGS = {
         'repo_url_shorthand': True,
     },
     'markdown_link_attr_modifier': {
-        'new_tab': 'external_only',
+        'new_tab': 'on',
         'no_referrer': 'external_only',
         'auto_title': 'on',
     },
