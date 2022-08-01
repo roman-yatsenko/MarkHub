@@ -1,14 +1,15 @@
-from pathlib import Path
-from typing import Dict, List, Union, Optional
+from pathlib import Path, PurePosixPath
+from typing import Dict, List, Optional, Union
 
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.http.request import HttpRequest
-
+from django.utils.html import format_html
 from github import Github, UnknownObjectException
+from github.ContentFile import ContentFile
 from github.Repository import Repository
+from markhub.settings import log_error_with_404, logger
 
-from markhub.settings import logger
 
 @logger.catch
 def get_github_handler(user: User) -> Union[Github, None]:
@@ -58,22 +59,41 @@ class GitHubRepository:
         if self.handler:
             request.session['__current_repo__'] = repo_name
 
-    def save_current_branch(self, request: HttpRequest, branch: str) -> None:
-        """ Save repository in session
-        
-        Args:
-            request: Django request object
-            branch: branch name
-        """
-        self.branch = branch
-        request.session[f'{self.handler.name}__current_branch'] = self.branch
+    def get_contents(self, path: str, branch: str) -> ContentFile:
+        """Get contents for path, otherwise raise Http404 exception
 
-    @property
-    def name(self) -> Optional[str]:
-        """Returns repository name"""
-        if self.handler:
-            return self.handler.name
+        Args:
+            path (str): repository item path
+            branch (str): repository branch
+
+        Returns:
+            ContentFile: repository item contents
+        """
+        if not branch:
+            branch = self.branch
+        try:
+            return self.handler.get_contents(path, ref=branch)
+        except UnknownObjectException as e:
+            log_error_with_404(f"Path not found - {e}")
     
+    def get_context(self, path: str, extra: Dict) -> Dict:
+        """Get template context dict with repository data
+
+        Args:
+            path: repository item path
+            extra: dictionary to extend result
+        
+        Returns:
+            Dict: template context
+        """
+        context = {
+            'repo': self.name,
+            'branch': self.branch,
+            'path': path,
+        }
+        context.update(extra)
+        return context
+
     def get_path_parts(self, path: str) -> Dict:
         """ Get path parts dict for path
         
@@ -89,3 +109,45 @@ class GitHubRepository:
         for i in range(len(path_parts)):
             path_parts_dict[path_parts[i]] = '/'.join(path_parts[:i+1])
         return path_parts_dict
+    
+    @property
+    def name(self) -> Optional[str]:
+        """Returns repository name"""
+        if self.handler:
+            return self.handler.name
+    
+    def save_current_branch(self, request: HttpRequest, branch: str) -> None:
+        """ Save repository in session
+        
+        Args:
+            request: Django request object
+            branch: branch name
+        """
+        self.branch = branch
+        request.session[f'{self.handler.name}__current_branch'] = self.branch
+    
+    def update_file(self, path: str, updated_content: str, branch: str = '') -> str:
+        """_summary_
+
+        Args:
+            path (str): path to the updated file
+            updated_content (str): updated content
+            branch (str): repository branch
+
+        Returns:
+            str: success message in html
+        """
+        branch = branch if branch else self.branch
+        contents = self.get_contents(path, branch)
+        status: dict = self.handler.update_file(
+            path=path, 
+            message=f"Update {PurePosixPath(path).name} at MarkHub", 
+            content=updated_content,
+            sha=contents.sha,
+            branch=branch)
+        return format_html(
+            'File {} was successfully updated with commit <a href="{}" target="_blank">{}</a>.',
+            path,
+            status["commit"].html_url,
+            status["commit"].sha[:7]
+        )
