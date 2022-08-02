@@ -157,14 +157,9 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
         context = super().get_context_data(**kwargs)
-        context['user_name'] = self.user_name
-        context['repo'] = self.repo.name
-        context['branch'] = self.branch
-        context['branches'] = self.repo.branches
-        context['path'] = self.path
-        if self.path:
-            context['path_parts'] = self.repo.get_path_parts(self.path)
-            context['parent_path'] = str(Path(self.path).parent)
+        context.update(self.repo.get_context(self.path, extra={
+            'user_name': self.user_name,
+        }))
         return context
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:

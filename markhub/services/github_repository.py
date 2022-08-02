@@ -145,8 +145,12 @@ class GitHubRepository:
         context = {
             'repo': self.name,
             'branch': self.branch,
+            'branches': self.branches,
             'path': path,
         }
+        if path:
+            context['path_parts'] = self.get_path_parts(path)
+            context['parent_path'] = str(Path(path).parent)
         context.update(extra)
         return context
 
