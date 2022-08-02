@@ -59,6 +59,34 @@ class GitHubRepository:
         if self.handler:
             request.session['__current_repo__'] = repo_name
 
+    def create_file(self, path: str, content: str, branch: str = '') -> str:
+        """Create a new file in the repository if success otherwise raise 404 exception
+
+        Args:
+            path (str): path to the new file
+            updated_content (str): new file content
+            branch (str): repository branch. Defaults to '' (current repository branch)
+
+        Returns:
+            str: success message in html
+        """
+        branch = branch if branch else self.branch
+        try: 
+            status: dict = self.handler.create_file(
+                path=path, 
+                message=f"Add {PurePosixPath(path).name} at MarkHub", 
+                content=content, 
+                branch=branch
+            )
+            return format_html(
+                'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
+                path,
+                status["commit"].html_url,
+                status["commit"].sha[:7]
+            )
+        except UnknownObjectException as e:
+            log_error_with_404(f"File not created - {e}")
+        
     def get_contents(self, path: str, branch: str) -> ContentFile:
         """Get contents for path, otherwise raise Http404 exception
 
@@ -127,27 +155,30 @@ class GitHubRepository:
         request.session[f'{self.handler.name}__current_branch'] = self.branch
     
     def update_file(self, path: str, updated_content: str, branch: str = '') -> str:
-        """_summary_
+        """Update a file in the repository
 
         Args:
             path (str): path to the updated file
             updated_content (str): updated content
-            branch (str): repository branch
+            branch (str): repository branch. Defaults to '' (current repository branch)
 
         Returns:
             str: success message in html
         """
         branch = branch if branch else self.branch
-        contents = self.get_contents(path, branch)
-        status: dict = self.handler.update_file(
-            path=path, 
-            message=f"Update {PurePosixPath(path).name} at MarkHub", 
-            content=updated_content,
-            sha=contents.sha,
-            branch=branch)
-        return format_html(
-            'File {} was successfully updated with commit <a href="{}" target="_blank">{}</a>.',
-            path,
-            status["commit"].html_url,
-            status["commit"].sha[:7]
-        )
+        try:
+            contents = self.get_contents(path, branch)
+            status: dict = self.handler.update_file(
+                path=path, 
+                message=f"Update {PurePosixPath(path).name} at MarkHub", 
+                content=updated_content,
+                sha=contents.sha,
+                branch=branch)
+            return format_html(
+                'File {} was successfully updated with commit <a href="{}" target="_blank">{}</a>.',
+                path,
+                status["commit"].html_url,
+                status["commit"].sha[:7]
+            )
+        except UnknownObjectException as e:
+            log_error_with_404(f"File not updated - {e}")

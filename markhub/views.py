@@ -22,101 +22,6 @@ from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
 
 
-def get_webmanifest(request: HttpRequest) -> FileResponse:
-    """ _Get webmanifest file in the DEBUG mode_
-
-    Args:
-        request (HttpRequest): _request object_
-
-    Returns:
-        FileResponse: _webmanifest as FileResponse_
-    """
-    return FileResponse(open('manifest.webmanifest', 'rb'))
-
-
-@login_required
-def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:
-    """ New File Controller
-    
-    Args:
-        request: request from form
-        repo: repository name
-        path: repository path (empty str for root) for the new file
-
-    Returns:
-        rendered page
-    """
-    if repository := GitHubRepository(request, repo):
-        context = {
-            'title': 'New file in',
-            'repo': repository.name,
-            'branch': repository.branch,
-            'path': path,
-        }
-        if request.method == 'POST':
-            new_file_form = NewFileForm(request.POST)
-            if new_file_form.is_valid():
-                filename: str = new_file_form.cleaned_data["filename"]
-                newfile_path: str = f'{path + "/" if path else ""}{filename}'
-                try: 
-                    status: dict = repository.handler.create_file(
-                        path=newfile_path, 
-                        message=f"Add {filename} at MarkHub", 
-                        content=new_file_form.cleaned_data['content'], 
-                        branch=repository.branch)
-                except UnknownObjectException as e:
-                    logger.error(f"File not created - {e}")
-                    raise Http404(f"File not created - {e}")
-                message: str = format_html(
-                    'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
-                    newfile_path,
-                    status["commit"].html_url,
-                    status["commit"].sha[:7]
-                )
-                messages.success(request, message)
-                return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
-        else:
-            new_file_form = NewFileForm()
-        context['form'] = new_file_form
-        return render(request, 'edit_file.html', context)
-    else:
-        raise Http404("Repository not found")
-
-@login_required
-def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
-    """ Update File Controller
-    
-    Args:
-        request: request from form
-        repo: repository name
-        path: repository file path
-
-    Returns:
-        rendered page
-    """
-    if repository := GitHubRepository(request, repo):
-        context = repository.get_context(path, extra={
-            'update': True,
-            'title': 'Update file',
-        })
-        if request.method == 'POST':
-            update_file_form = UpdateFileForm(request.POST)
-            if update_file_form.is_valid():
-                messages.success(request, repository.update_file(
-                                            path, 
-                                            updated_content=update_file_form.cleaned_data['content']
-                ))
-                return redirect('file', repo=repo, branch=repository.branch, path=path)
-        else:
-            update_file_form = UpdateFileForm(data={
-                'filename': path,
-                'content': repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8'),
-            })
-        context['form'] = update_file_form
-        return render(request, 'edit_file.html', context)
-    else:
-        raise Http404("Repository not found")
-
 @login_required
 def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     """ Delete File Controller
@@ -154,6 +59,87 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
         else:
             return redirect('repo', repo=repo)
+    else:
+        raise Http404("Repository not found")
+
+
+def get_webmanifest(request: HttpRequest) -> FileResponse:
+    """ _Get webmanifest file in the DEBUG mode_
+
+    Args:
+        request (HttpRequest): _request object_
+
+    Returns:
+        FileResponse: _webmanifest as FileResponse_
+    """
+    return FileResponse(open('manifest.webmanifest', 'rb'))
+
+
+@login_required
+def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpResponse:
+    """ New File Controller
+    
+    Args:
+        request: request from form
+        repo: repository name
+        path: repository path (empty str for root) for the new file
+
+    Returns:
+        rendered page
+    """
+    if repository := GitHubRepository(request, repo):
+        context = repository.get_context(path, extra={
+            'title': 'New file in',
+        })
+        if request.method == 'POST':
+            new_file_form = NewFileForm(request.POST)
+            if new_file_form.is_valid():
+                newfile_path: str = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}'
+                messages.success(request, repository.create_file(
+                                            path=newfile_path, 
+                                            content=new_file_form.cleaned_data['content']
+                ))
+                return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
+        else:
+            new_file_form = NewFileForm()
+        context['form'] = new_file_form
+        return render(request, 'edit_file.html', context)
+    else:
+        raise Http404("Repository not found")
+
+
+@login_required
+def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
+    """ Update File Controller
+    
+    Args:
+        request: request from form
+        repo: repository name
+        path: repository file path
+
+    Returns:
+        rendered page
+    """
+    if repository := GitHubRepository(request, repo):
+        context = repository.get_context(path, extra={
+            'update': True,
+            'title': 'Update file',
+        })
+        if request.method == 'POST':
+            update_file_form = UpdateFileForm(request.POST)
+            if update_file_form.is_valid():
+                messages.success(request, repository.update_file(
+                                            path, 
+                                            updated_content=update_file_form.cleaned_data['content']
+                ))
+                return redirect('file', repo=repo, branch=repository.branch, path=path)
+        else:
+            update_file_form = UpdateFileForm(data={
+                'filename': path,
+                'content': repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8'),
+            })
+        context['form'] = update_file_form
+        return render(request, 'edit_file.html', context)
     else:
         raise Http404("Repository not found")
 
