@@ -35,27 +35,10 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
     if repository := GitHubRepository(request, repo):
-        path_object = PurePosixPath(path)
-        parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-        try:
-            contents = repository.handler.get_contents(path, ref=repository.branch)
-            status: dict = repository.handler.delete_file(
-                contents.path, 
-                f"Delete {path_object.name} at MarkHub", 
-                contents.sha, 
-                branch=repository.branch
-            )
-            message: str = format_html(
-                    'File {} was successfully deleted with commit <a href="{}" target="_blank">{}</a>.',
-                    path,
-                    status["commit"].html_url,
-                    status["commit"].sha[:7]
-                )
-            messages.success(request, message)
-        except UnknownObjectException as e:
-            logger.error(f"Path not found - {e}")
-            raise Http404(f"Path not found - {e}")
+        messages.success(request, repository.delete_file(path))
         if path:
+            path_object = PurePosixPath(path)
+            parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
             return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
         else:
             return redirect('repo', repo=repo)

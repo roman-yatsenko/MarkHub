@@ -86,7 +86,35 @@ class GitHubRepository:
             )
         except UnknownObjectException as e:
             log_error_with_404(f"File not created - {e}")
-        
+    
+    def delete_file(self, path: str, branch: str = '') -> str:
+        """Delete a file in the repository if success otherwise raise 404 exception
+
+        Args:
+            path (str): path to the deleted file
+            branch (str): repository branch. Defaults to '' (current repository branch)
+
+        Returns:
+            str: success message in html
+        """
+        branch = branch if branch else self.branch
+        try:
+            contents = self.handler.get_contents(path, ref=branch)
+            status: dict = self.handler.delete_file(
+                contents.path, 
+                f"Delete {PurePosixPath(path).name} at MarkHub", 
+                contents.sha, 
+                branch
+            )
+            return format_html(
+                    'File {} was successfully deleted with commit <a href="{}" target="_blank">{}</a>.',
+                    path,
+                    status["commit"].html_url,
+                    status["commit"].sha[:7]
+            )
+        except UnknownObjectException as e:
+            log_error_with_404(f"Path not found - {e}")
+
     def get_contents(self, path: str, branch: str) -> ContentFile:
         """Get contents for path, otherwise raise Http404 exception
 
@@ -155,7 +183,7 @@ class GitHubRepository:
         request.session[f'{self.handler.name}__current_branch'] = self.branch
     
     def update_file(self, path: str, updated_content: str, branch: str = '') -> str:
-        """Update a file in the repository
+        """Update a file in the repository if success otherwise raise 404 exception
 
         Args:
             path (str): path to the updated file
