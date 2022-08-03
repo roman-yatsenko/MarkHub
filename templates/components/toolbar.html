@@ -1,4 +1,4 @@
-<ul class="nav mt-3 gap-2">
+<ul class="nav mt-3 gap-1">
   <li class="nav-item mt-1">
     <i class="bi bi-git"></i>
   </li>
@@ -6,7 +6,11 @@
     <form method="POST">
       {% csrf_token %}
       <select class="form-select form-select-sm" id="branch_selector" name="selected_branch" 
-          onchange="this.form.submit();">
+          onchange="this.form.submit();"
+          {% if disable_branch_selector %}
+            disabled
+          {% endif %}
+      >
         {% for item in branches %}
           {% if item == branch %}
             <option value='{{item}}' selected>

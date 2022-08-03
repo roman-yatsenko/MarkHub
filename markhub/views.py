@@ -1,29 +1,50 @@
 from pathlib import Path, PurePosixPath
 from typing import Any, Dict
-from urllib.request import urlopen
 from urllib.error import HTTPError
+from urllib.request import urlopen
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, FileResponse
+from django.http import FileResponse, Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
-
 from github import GithubException, UnknownObjectException
 from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
 from .services.github_repository import GitHubRepository, get_github_handler
-from .settings import (
-    MARTOR_MARKDOWN_EXTENSIONS,
-    MARTOR_MARKDOWN_EXTENSION_CONFIGS,
-    logger,
-)
+from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
+                       MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
+
+
+@login_required
+def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
+    """ Delete File Controller
+    
+    Args:
+        request: request from form
+        repo: repository name
+        path: repository file path
+
+    Returns:
+        rendered page
+    """
+    if repository := GitHubRepository(request, repo):
+        messages.success(request, repository.delete_file(path))
+        if path:
+            path_object = PurePosixPath(path)
+            parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
+            return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
+        else:
+            return redirect('repo', repo=repo)
+    else:
+        raise Http404("Repository not found")
+
 
 def get_webmanifest(request: HttpRequest) -> FileResponse:
     """ _Get webmanifest file in the DEBUG mode_
@@ -50,33 +71,18 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         rendered page
     """
     if repository := GitHubRepository(request, repo):
-        context = {
+        context = repository.get_context(path, extra={
             'title': 'New file in',
-            'repo': repository.name,
-            'branch': repository.branch,
-            'path': path,
-        }
+            'disable_branch_selector': True,
+        })
         if request.method == 'POST':
             new_file_form = NewFileForm(request.POST)
             if new_file_form.is_valid():
-                filename: str = new_file_form.cleaned_data["filename"]
-                newfile_path: str = f'{path + "/" if path else ""}{filename}'
-                try: 
-                    status: dict = repository.handler.create_file(
-                        path=newfile_path, 
-                        message=f"Add {filename} at MarkHub", 
-                        content=new_file_form.cleaned_data['content'], 
-                        branch=repository.branch)
-                except UnknownObjectException as e:
-                    logger.error(f"File not created - {e}")
-                    raise Http404(f"File not created - {e}")
-                message: str = format_html(
-                    'File {} was successfully created with commit <a href="{}" target="_blank">{}</a>.',
-                    newfile_path,
-                    status["commit"].html_url,
-                    status["commit"].sha[:7]
-                )
-                messages.success(request, message)
+                newfile_path: str = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}'
+                messages.success(request, repository.create_file(
+                                            path=newfile_path, 
+                                            content=new_file_form.cleaned_data['content']
+                ))
                 return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
         else:
             new_file_form = NewFileForm()
@@ -84,6 +90,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
         return render(request, 'edit_file.html', context)
     else:
         raise Http404("Repository not found")
+
 
 @login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
@@ -98,84 +105,26 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         rendered page
     """
     if repository := GitHubRepository(request, repo):
-        context = {
+        context = repository.get_context(path, extra={
             'update': True,
             'title': 'Update file',
-            'repo': repository.name,
-            'branch': repository.branch,
-            'path': path,
-        }
-        try:
-            contents = repository.handler.get_contents(path, ref=repository.branch)
-        except UnknownObjectException as e:
-                logger.error(f"Path not found - {e}")
-                raise Http404(f"Path not found - {e}")
+            'disable_branch_selector': True,
+        })
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
-                path_object = PurePosixPath(path)
-                status: dict = repository.handler.update_file(
-                    path=path, 
-                    message=f"Update {path_object.name} at MarkHub", 
-                    content=update_file_form.cleaned_data['content'],
-                    sha=contents.sha,
-                    branch=repository.branch)
-                message: str = format_html(
-                    'File {} was successfully updated with commit <a href="{}" target="_blank">{}</a>.',
-                    path,
-                    status["commit"].html_url,
-                    status["commit"].sha[:7]
-                )
-                messages.success(request, message)
+                messages.success(request, repository.update_file(
+                                            path, 
+                                            updated_content=update_file_form.cleaned_data['content']
+                ))
                 return redirect('file', repo=repo, branch=repository.branch, path=path)
         else:
-            data = {
+            update_file_form = UpdateFileForm(data={
                 'filename': path,
-                'content': contents.decoded_content.decode('UTF-8'),
-            }
-            update_file_form = UpdateFileForm(data)
+                'content': repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8'),
+            })
         context['form'] = update_file_form
         return render(request, 'edit_file.html', context)
-    else:
-        raise Http404("Repository not found")
-
-@login_required
-def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
-    """ Delete File Controller
-    
-    Args:
-        request: request from form
-        repo: repository name
-        path: repository file path
-
-    Returns:
-        rendered page
-    """
-    if repository := GitHubRepository(request, repo):
-        path_object = PurePosixPath(path)
-        parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-        try:
-            contents = repository.handler.get_contents(path, ref=repository.branch)
-            status: dict = repository.handler.delete_file(
-                contents.path, 
-                f"Delete {path_object.name} at MarkHub", 
-                contents.sha, 
-                branch=repository.branch
-            )
-            message: str = format_html(
-                    'File {} was successfully deleted with commit <a href="{}" target="_blank">{}</a>.',
-                    path,
-                    status["commit"].html_url,
-                    status["commit"].sha[:7]
-                )
-            messages.success(request, message)
-        except UnknownObjectException as e:
-            logger.error(f"Path not found - {e}")
-            raise Http404(f"Path not found - {e}")
-        if path:
-            return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
-        else:
-            return redirect('repo', repo=repo)
     else:
         raise Http404("Repository not found")
 
@@ -210,14 +159,9 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
         context = super().get_context_data(**kwargs)
-        context['user_name'] = self.user_name
-        context['repo'] = self.repo.name
-        context['branch'] = self.branch
-        context['branches'] = self.repo.branches
-        context['path'] = self.path
-        if self.path:
-            context['path_parts'] = self.repo.get_path_parts(self.path)
-            context['parent_path'] = str(Path(self.path).parent)
+        context.update(self.repo.get_context(self.path, extra={
+            'user_name': self.user_name,
+        }))
         return context
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
