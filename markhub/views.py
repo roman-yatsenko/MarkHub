@@ -73,6 +73,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     if repository := GitHubRepository(request, repo):
         context = repository.get_context(path, extra={
             'title': 'New file in',
+            'disable_branch_selector': True,
         })
         if request.method == 'POST':
             new_file_form = NewFileForm(request.POST)
@@ -107,6 +108,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
         context = repository.get_context(path, extra={
             'update': True,
             'title': 'Update file',
+            'disable_branch_selector': True,
         })
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
