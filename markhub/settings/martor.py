@@ -62,6 +62,7 @@ MARTOR_MARKDOWN_EXTENSIONS = [
     'pymdownx.keys',
     'pymdownx.magiclink',
     'pymdownx.mark',
+    'pymdownx.saneheaders',
     'pymdownx.smartsymbols',
     'pymdownx.tabbed',
     'pymdownx.tasklist',

@@ -27,12 +27,17 @@
   {% include "components/toolbar.html" %}
   <form method="post">
     {% csrf_token %}
-    {% if not update %}
-      <div class="mb-3 mt-3">
+      <div
+        {% if update %} 
+        class="mb-3 mt-3 d-none"
+        {% else %}
+        class="mb-3 mt-3"
+        {% endif %}
+      >
         <label for="email" class="form-label">File name:</label>
         {{ form.filename }}
       </div>
-    {% endif %}
+    
     <div class="mb-3">
       {{ form.content }}
     </div>
