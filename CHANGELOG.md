@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - toolbar to new and edit file pages
 - PyMdown SaneHeaders Extension
-
+- repository type on the Home page
+- показувати тип репозиторію за допомогою бейджів
 ### Changed
 
 ### Deprecated

@@ -144,6 +144,7 @@ class GitHubRepository:
         """
         context = {
             'repo': self.name,
+            'private': self.handler.private,
             'branch': self.branch,
             'branches': self.branches,
             'path': path,
