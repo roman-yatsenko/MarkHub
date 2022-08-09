@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyMdown SaneHeaders Extension
 - repository type on the Home page
 - PrivatePublish model
+- show private repos if you have private_repos permission
 
 ### Changed
 

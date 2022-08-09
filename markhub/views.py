@@ -141,7 +141,8 @@ class HomeView(TemplateView):
             context['repos'] = [
                 (repo.name, repo.created_at, repo.private) 
                 for repo in g.get_user().get_repos() 
-                if user.username == repo.owner.login
+                if user.username == repo.owner.login 
+                and (not repo.private or user.has_perm('markhub.private_repos'))
             ]
         return context
 
