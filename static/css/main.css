@@ -4,6 +4,16 @@
     background-color: #0066cc;
 }
 
+/* Toolbar */
+
+#toolbar .nav-item .btn {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    border-radius: .2rem;
+}
+
+/* Footer */
+
 .footer {
     background-color: 	#ffcc00;
 }
