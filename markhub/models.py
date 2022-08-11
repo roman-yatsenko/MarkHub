@@ -14,7 +14,7 @@ class PrivatePublish(models.Model):
     repo = models.TextField(max_length=100, verbose_name='Repository name')
     path = models.TextField(max_length=4096, verbose_name='File path')
     published = models.DateTimeField(auto_now_add=True, verbose_name='Publication time')
-    content = models.TextField(null=True, blank=True, verbose_name='Rendered content')
+    content = models.TextField(null=True, blank=True, verbose_name='Markdown content')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User - Repository owner")
 
     class Meta:

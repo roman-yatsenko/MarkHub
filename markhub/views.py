@@ -17,6 +17,7 @@ from github import GithubException, UnknownObjectException
 from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
+from .models import PrivatePublish
 from .services.github_repository import GitHubRepository, get_github_handler
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
@@ -91,6 +92,37 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     else:
         raise Http404("Repository not found")
 
+
+@login_required
+def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
+    """Publish file from private repository
+
+    Args:
+        request (HttpRequest): _Django request instance_
+        user (str): _user name_
+        repo (str): _repository name_
+        branch (str): _branch name_
+        path (str): _file path_
+
+    Raises:
+        Http404: _Repository not found_
+
+    Returns:
+        HttpResponse: redirect to share page
+    """
+    if repository := GitHubRepository(request, repo):
+        content = repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8')
+        published_file = PrivatePublish(
+            user=user,
+            repo=repo,
+            path=path,
+            content=content,
+            owner=request.user
+        )
+        published_file.save()
+        return redirect('share', user=user, repo=repo, branch=branch, path=path)
+    else:
+        raise Http404("Repository not found")
 
 @login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
@@ -230,6 +262,30 @@ class ShareView(TemplateView):
     GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{user}/{repo}/{branch}/{path}'
     GITHUB_URL_TEMPLATE = 'https://github.com/{user}/{repo}//blob/{branch}/{path}'
 
+    def _markdown(self) -> Markdown:
+        """
+        Rerurn the Markdown object with martor settings
+
+        Returns:
+            Markdown object
+        """
+        return Markdown(
+            extensions=MARTOR_MARKDOWN_EXTENSIONS,
+            extension_configs=MARTOR_MARKDOWN_EXTENSION_CONFIGS,
+            output_format="html5",
+        )
+    
+    def _render_file(self, context: dict) -> Markdown:
+        """Render file from repository
+
+        Args:
+            context (dict): context dict with request parameters
+
+        Returns:
+            Markdown: Markdown instance with rendered file
+        """
+        pass
+
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
         context = super().get_context_data(**kwargs)
@@ -251,17 +307,3 @@ class ShareView(TemplateView):
             finally:
                 context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
         return context
-
-    def _markdown(self) -> Markdown:
-        """
-        Rerurn the Markdown object with martor settings
-
-        Returns:
-            Markdown object
-        """
-        return Markdown(
-            extensions=MARTOR_MARKDOWN_EXTENSIONS,
-            extension_configs=MARTOR_MARKDOWN_EXTENSION_CONFIGS,
-            output_format="html5",
-        )
-    
