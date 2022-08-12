@@ -17,7 +17,6 @@ from github import GithubException, UnknownObjectException
 from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
-from .models import PrivatePublish
 from .services.github_repository import GitHubRepository, get_github_handler
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
@@ -111,15 +110,7 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
         HttpResponse: redirect to share page
     """
     if repository := GitHubRepository(request, repo):
-        content = repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8')
-        published_file = PrivatePublish(
-            user=user,
-            repo=repo,
-            path=path,
-            content=content,
-            owner=request.user
-        )
-        published_file.save()
+        messages.success(request, repository.publish_file(request, path))
         return redirect('share', user=user, repo=repo, branch=branch, path=path)
     else:
         raise Http404("Repository not found")
@@ -275,8 +266,8 @@ class ShareView(TemplateView):
             output_format="html5",
         )
     
-    def _render_file(self, context: dict) -> Markdown:
-        """Render file from repository
+    def _render_shared_file(self, context: dict) -> Markdown:
+        """Render file from PrivatePublish or public repository
 
         Args:
             context (dict): context dict with request parameters
@@ -289,8 +280,7 @@ class ShareView(TemplateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
         context = super().get_context_data(**kwargs)
-        params = ('user', 'repo', 'branch', 'path')
-        if all(x in context for x in params):
+        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
             try:
                 usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
                 markdown = self._markdown()

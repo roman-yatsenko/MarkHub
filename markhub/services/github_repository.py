@@ -8,6 +8,7 @@ from django.utils.html import format_html
 from github import Github, UnknownObjectException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
+from markhub.models import PrivatePublish
 from markhub.settings import log_error_with_404, logger
 
 
@@ -54,9 +55,9 @@ class GitHubRepository:
                         self.save_current_branch(request, self.handler.default_branch)
                         logger.info(f"{user.username}/{repo_name} have got from GitHub")
                 except UnknownObjectException as e:
-                    logger.error(f"Repository not found - {e}")
-                    raise Http404(f"Repository not found - {e}")
+                    log_error_with_404(f"Repository not found - {e}")
         if self.handler:
+            self.user = self.handler.owner.name
             request.session['__current_repo__'] = repo_name
 
     def create_file(self, path: str, content: str, branch: str = '') -> str:
@@ -177,6 +178,31 @@ class GitHubRepository:
         if self.handler:
             return self.handler.name
     
+    def publish_file(self, request: HttpRequest, path: str) -> str:
+        """Save file in PrivatePublish model for sharing
+
+        Args:
+            request (HttpRequest): _Django request instance_
+            path (str): _File path_
+
+        Returns:
+            str: _description_
+        """
+        content = repository.get_contents(path, self.branch).decoded_content.decode('UTF-8')
+        published_file = PrivatePublish(
+            user=self.user,
+            repo=self.repo,
+            path=self.name,
+            content=content,
+            owner=request.user
+        )
+        published_file.save()
+        return format_html(
+            'File {%1} was successfully published with the link <a href="{%2}">{%2}</a>',
+            path,
+            "{% url 'share' user_name repo branch path %}"
+        )
+
     def save_current_branch(self, request: HttpRequest, branch: str) -> None:
         """ Save repository in session
         
