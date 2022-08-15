@@ -188,11 +188,11 @@ class GitHubRepository:
         Returns:
             str: _description_
         """
-        content = repository.get_contents(path, self.branch).decoded_content.decode('UTF-8')
+        content = self.get_contents(path, self.branch).decoded_content.decode('UTF-8')
         published_file = PrivatePublish(
             user=self.user,
-            repo=self.repo,
-            path=self.name,
+            repo=self.name,
+            path=path,
             content=content,
             owner=request.user
         )

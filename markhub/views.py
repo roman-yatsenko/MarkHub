@@ -17,6 +17,7 @@ from github import GithubException, UnknownObjectException
 from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
+from .models import PrivatePublish
 from .services.github_repository import GitHubRepository, get_github_handler
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
@@ -266,34 +267,41 @@ class ShareView(TemplateView):
             output_format="html5",
         )
     
-    def _render_shared_file(self, context: dict) -> Markdown:
-        """Render file from PrivatePublish or public repository
+    def _shared_file_content(self, context: dict) -> str:
+        """Shared file content from PrivatePublish or public repository
 
         Args:
             context (dict): context dict with request parameters
 
         Returns:
-            Markdown: Markdown instance with rendered file
+            str: shared file content
         """
-        pass
-
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Get context data for share page view"""
-        context = super().get_context_data(**kwargs)
-        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
+        content = None
+        try:
+            content = PrivatePublish.objects.get(
+                user=context['user'],
+                repo=context['repo'],
+                path=context['path']
+            ).content
+        except PrivatePublish.DoesNotExist as e:
             try:
-                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
-                markdown = self._markdown()
-                context['contents'] = mark_safe(markdown.convert(urlopen(usercontent_url).read().decode('utf-8')))
-                context['toc'] = mark_safe(markdown.toc)
+                content = urlopen(ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)).read().decode('utf-8')
             except HTTPError as e:
-                error_message = f"Url not found - {usercontent_url}"
-                logger.error(error_message)
-                raise Http404(error_message)
+                log_error_with_404(f"Url not found - {usercontent_url}")
             except UnicodeDecodeError as e:
                 context['decode_error'] = True
                 context['contents'] = f"Unicode decode error during openning {context['path']}"
                 logger.error(context['contents'])
             finally:
                 context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
+        return content
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for share page view"""
+        context = super().get_context_data(**kwargs)
+        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
+            if content := self._shared_file_content(context):
+                markdown = self._markdown()
+                context['contents'] = mark_safe(markdown.convert(content))
+                context['toc'] = mark_safe(markdown.toc)
         return context
