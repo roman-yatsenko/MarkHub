@@ -178,31 +178,6 @@ class GitHubRepository:
         if self.handler:
             return self.handler.name
     
-    def publish_file(self, request: HttpRequest, path: str) -> str:
-        """Save file in PrivatePublish model for sharing
-
-        Args:
-            request (HttpRequest): _Django request instance_
-            path (str): _File path_
-
-        Returns:
-            str: _description_
-        """
-        content = self.get_contents(path, self.branch).decoded_content.decode('UTF-8')
-        published_file = PrivatePublish(
-            user=self.user,
-            repo=self.name,
-            path=path,
-            content=content,
-            owner=request.user
-        )
-        published_file.save()
-        return format_html(
-            'File {%1} was successfully published with the link <a href="{%2}">{%2}</a>',
-            path,
-            "{% url 'share' user_name repo branch path %}"
-        )
-
     def save_current_branch(self, request: HttpRequest, branch: str) -> None:
         """ Save repository in session
         

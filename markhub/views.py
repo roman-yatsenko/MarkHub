@@ -10,6 +10,7 @@ from django.http import FileResponse, Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
@@ -111,7 +112,16 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
         HttpResponse: redirect to share page
     """
     if repository := GitHubRepository(request, repo):
-        messages.success(request, repository.publish_file(request, path))
+        content = repository.get_contents(path, branch).decoded_content.decode('UTF-8')
+        published_file = PrivatePublish(
+            user=user, repo=repo, branch=branch, path=path,
+            content=content, owner=request.user
+        )
+        published_file.save()
+        messages.success(request, format_html(
+            'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
+            path, request.get_host() + reverse('share', args=[user, repo, branch, path])
+        ))
         return redirect('share', user=user, repo=repo, branch=branch, path=path)
     else:
         raise Http404("Repository not found")
@@ -281,11 +291,14 @@ class ShareView(TemplateView):
             content = PrivatePublish.objects.get(
                 user=context['user'],
                 repo=context['repo'],
+                branch=context['branch'],
                 path=context['path']
             ).content
+            context['private'] = True
         except PrivatePublish.DoesNotExist as e:
             try:
-                content = urlopen(ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)).read().decode('utf-8')
+                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
+                content = urlopen(usercontent_url).read().decode('utf-8')
             except HTTPError as e:
                 log_error_with_404(f"Url not found - {usercontent_url}")
             except UnicodeDecodeError as e:
