@@ -120,7 +120,7 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
         published_file.save()
         messages.success(request, format_html(
             'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
-            path, request.get_host() + reverse('share', args=[user, repo, branch, path])
+            path, request.build_absolute_uri(reverse('share', args=[user, repo, branch, path]))
         ))
         return redirect('share', user=user, repo=repo, branch=branch, path=path)
     else:
