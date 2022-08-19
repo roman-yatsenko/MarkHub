@@ -243,6 +243,8 @@ class FileView(BaseRepoView):
         try:
             contents = self.repo.handler.get_contents(self.path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
+            if file := PrivatePublish.lookup_published_file(context):
+                context['published'] = True
         except GithubException as e:
             logger.error(f"File not found - {e}")
             raise Http404(
@@ -287,15 +289,10 @@ class ShareView(TemplateView):
             str: shared file content
         """
         content = None
-        try:
-            content = PrivatePublish.objects.get(
-                user=context['user'],
-                repo=context['repo'],
-                branch=context['branch'],
-                path=context['path']
-            ).content
+        if file := PrivatePublish.lookup_published_file(context):
+            content = file.content
             context['private'] = True
-        except PrivatePublish.DoesNotExist as e:
+        else:
             try:
                 usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
                 content = urlopen(usercontent_url).read().decode('utf-8')

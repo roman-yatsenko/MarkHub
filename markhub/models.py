@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -48,3 +50,22 @@ class PrivatePublish(models.Model):
             'repo': self.repo,
             'path': self.path
         })
+
+    def lookup_published_file(self, context: dict) -> Optional[PrivatePublish]:
+        """Lookup for published file
+
+        Args:
+            context (dict): context dict with request parameters
+
+        Returns:
+            Optional[PrivatePublish]: PrivatePublish instance is published (bool) or None
+        """
+        try:
+            return self.objects.get(
+                user=context['user'],
+                repo=context['repo'],
+                branch=context['branch'],
+                path=context['path']
+            )
+        except self.DoesNotExist as e:
+            return None
