@@ -20,7 +20,7 @@ from django.urls import include, path, re_path
 
 from .views import (FileView, HomeView, RepoView, ShareView, delete_file_ctr,
                     get_webmanifest, new_file_ctr, publish_file_ctr,
-                    update_file_ctr)
+                    unpublish_file_ctr, update_file_ctr)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,6 +36,8 @@ urlpatterns = [
     re_path(r'^update-file/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<path>.+)/$', update_file_ctr, name='update-file'),
     re_path(r'^publish/(?P<user>[-a-zA-Z0-9_\.]+)/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.+)/$', 
             publish_file_ctr, name='publish'),
+    re_path(r'^unpublish/(?P<user>[-a-zA-Z0-9_\.]+)/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.+)/$', 
+            unpublish_file_ctr, name='unpublish'),
     re_path(r'^view/(?P<user>[-a-zA-Z0-9_\.]+)/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/$', 
             ShareView.as_view(), name='share-base'),
     re_path(r'^view/(?P<user>[-a-zA-Z0-9_\.]+)/(?P<repo>[-a-zA-Z0-9_\.]+)/(?P<branch>[^/]+)/(?P<path>.+)/$', 

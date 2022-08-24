@@ -127,6 +127,35 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
         raise Http404("Repository not found")
 
 @login_required
+def unpublish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
+    """Unpublish file from private repository
+
+    Args:
+        request (HttpRequest): _Django request instance_
+        user (str): _user name_
+        repo (str): _repository name_
+        branch (str): _branch name_
+        path (str): _file path_
+
+    Raises:
+        Http404: _Repository not found_
+
+    Returns:
+        HttpResponse: redirect to file page with result message
+    """
+    if repository := GitHubRepository(request, repo):
+        try:
+            published_file = PrivatePublish.lookup_published_file(locals())
+            published_file.delete()
+            messages.success(request, f'File {path} was successfully unpublished')
+        except:
+            messages.error(request, f'Error was happened during unpublishing {path}')
+        finally:
+            return redirect('file', repo=repo, branch=branch, path=path)
+    else:
+        raise Http404("Repository not found")
+
+@login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     """ Update File Controller
     
