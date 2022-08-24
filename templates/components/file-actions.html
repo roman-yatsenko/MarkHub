@@ -10,9 +10,14 @@
 {% if private %}
 <a class="btn btn-outline-success" href="{% url 'publish' user_name repo branch path %}" target="_blank" 
     title="Publish file">
+    {% if published %}
+    <i class="bi bi-cloud-arrow-down"></i> Unpublish
+    {% else %}
     <i class="bi bi-cloud-arrow-up"></i> Publish
+    {% endif %}
 </a> 
-{% else %}
+{% endif %}
+{% if not private or published %}
 <a class="btn btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank" 
     title="Share file">
     <i class="bi bi-share"></i> Share

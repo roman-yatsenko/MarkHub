@@ -51,7 +51,8 @@ class PrivatePublish(models.Model):
             'path': self.path
         })
 
-    def lookup_published_file(self, context: dict) -> Optional[PrivatePublish]:
+    @classmethod
+    def lookup_published_file(cls, context: dict) -> Optional['PrivatePublish']:
         """Lookup for published file
 
         Args:
@@ -61,11 +62,11 @@ class PrivatePublish(models.Model):
             Optional[PrivatePublish]: PrivatePublish instance is published (bool) or None
         """
         try:
-            return self.objects.get(
-                user=context['user'],
+            return cls.objects.get(
+                user=context.get('user_name') or context.get('user'),
                 repo=context['repo'],
                 branch=context['branch'],
                 path=context['path']
             )
-        except self.DoesNotExist as e:
+        except cls.DoesNotExist as e:
             return None
