@@ -149,7 +149,7 @@ def unpublish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, 
             published_file.delete()
             messages.success(request, f'File {path} was successfully unpublished')
         except:
-            messages.error(request, f'Error was happened during unpublishing {path}')
+            messages.warning(request, f'Error was happened during unpublishing {path}')
         finally:
             return redirect('file', repo=repo, branch=branch, path=path)
     else:

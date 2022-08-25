@@ -9,10 +9,9 @@
 
 {% if private %}
     {% if published %}
-    <a class="btn btn-outline-warning" href="{% url 'unpublish' user_name repo branch path %}" target="_blank" 
+    <a class="btn btn-outline-secondary" href="{% url 'unpublish' user_name repo branch path %}"
         title="Unpublish file">
         <i class="bi bi-cloud-arrow-down"></i> Unpublish
-    
     </a> 
     {% else %}
     <a class="btn btn-outline-success" href="{% url 'publish' user_name repo branch path %}" target="_blank" 
