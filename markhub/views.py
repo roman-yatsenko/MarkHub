@@ -173,6 +173,8 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             'title': 'Update file',
             'disable_branch_selector': True,
         })
+        context['published'] = True if context['private'] and PrivatePublish.lookup_published_file(context) else False
+        print(f"{context=}")
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
