@@ -59,7 +59,7 @@ class PrivatePublish(models.Model):
             context (dict): context dict with request parameters
 
         Returns:
-            Optional[PrivatePublish]: PrivatePublish instance is published (bool) or None
+            Optional[PrivatePublish]: PrivatePublish instance is published or None
         """
         try:
             return cls.objects.get(
@@ -70,3 +70,22 @@ class PrivatePublish(models.Model):
             )
         except cls.DoesNotExist as e:
             return None
+    
+    @classmethod
+    def publish_file(cls, context: dict) -> Optional['PrivatePublish']:
+        """Publish file or republish if it was published yet
+
+        Args:
+            context (dict): context dict with request parameters
+
+        Returns:
+            Optional[PrivatePublish]: PrivatePublish instance is published or None
+        """
+        if published_file := cls.lookup_published_file(context):
+            published_file.delete()
+        published_file = PrivatePublish(
+            user=context['user'], repo=context['repo'], branch=context['branch'], path=context['path'],
+            content=context['content'], owner=context['owner']
+        )
+        published_file.save()
+        return published_file

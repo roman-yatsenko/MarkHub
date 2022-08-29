@@ -43,8 +43,10 @@
     </div>
     <div class="form-group mb-2 d-flex justify-content-end">
       {% if published %}
-      {{ published }}
-      {{ form.republish }}
+      <div class="me-2 align-self-center">
+        {{ form.republish }}
+        Republish
+      </div>
       {% endif %}
       {% if update %}
       <button type="submit" class="btn btn-success" title="Update file">

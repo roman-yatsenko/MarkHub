@@ -112,12 +112,11 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
         HttpResponse: redirect to share page
     """
     if repository := GitHubRepository(request, repo):
-        content = repository.get_contents(path, branch).decoded_content.decode('UTF-8')
-        published_file = PrivatePublish(
-            user=user, repo=repo, branch=branch, path=path,
-            content=content, owner=request.user
-        )
-        published_file.save()
+        context = repository.get_context(path, extra={
+            'content': repository.get_contents(path, branch).decoded_content.decode('UTF-8'),
+            'owner': request.user,
+        })
+        PrivatePublish.publish_file(context)
         messages.success(request, format_html(
             'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
             path, request.build_absolute_uri(reverse('share', args=[user, repo, branch, path]))
@@ -173,15 +172,17 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             'title': 'Update file',
             'disable_branch_selector': True,
         })
-        context['published'] = True if context['private'] and PrivatePublish.lookup_published_file(context) else False
-        print(f"{context=}")
+        context['published'] = bool(context['private'] and PrivatePublish.lookup_published_file(context))
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
-                messages.success(request, repository.update_file(
-                                            path, 
-                                            updated_content=update_file_form.cleaned_data['content']
-                ))
+                updated_content = update_file_form.cleaned_data['content']
+                if status := repository.update_file(path, updated_content):
+                    if update_file_form.cleaned_data['republish']:
+                        context['content'] = updated_content
+                        context['owner'] = request.user
+                        PrivatePublish.publish_file(context)
+                    messages.success(request, status)
                 return redirect('file', repo=repo, branch=repository.branch, path=path)
         else:
             update_file_form = UpdateFileForm(data={
