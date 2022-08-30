@@ -8,7 +8,6 @@ from django.utils.html import format_html
 from github import Github, UnknownObjectException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
-from markhub.models import PrivatePublish
 from markhub.settings import log_error_with_404, logger
 
 
