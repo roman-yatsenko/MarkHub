@@ -6,6 +6,7 @@ from urllib.request import urlopen
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
@@ -218,10 +219,13 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
 
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
-        self.user_name = request.user.username
-        self.repo = GitHubRepository(request, kwargs['repo'])
-        self.path = kwargs.get('path', '')
-        self.branch = kwargs.get('branch', self.repo.branch)
+        if request.user.username:
+            self.user_name = request.user.username
+            self.repo = GitHubRepository(request, kwargs['repo'])
+            self.path = kwargs.get('path', '')
+            self.branch = kwargs.get('branch', self.repo.branch)
+        else:
+            raise PermissionDenied
     
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
