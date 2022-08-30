@@ -8,6 +8,7 @@ from django.utils.html import format_html
 from github import Github, UnknownObjectException
 from github.ContentFile import ContentFile
 from github.Repository import Repository
+from markhub.models import PrivatePublish
 from markhub.settings import log_error_with_404, logger
 
 
@@ -54,9 +55,9 @@ class GitHubRepository:
                         self.save_current_branch(request, self.handler.default_branch)
                         logger.info(f"{user.username}/{repo_name} have got from GitHub")
                 except UnknownObjectException as e:
-                    logger.error(f"Repository not found - {e}")
-                    raise Http404(f"Repository not found - {e}")
+                    log_error_with_404(f"Repository not found - {e}")
         if self.handler:
+            self.user = self.handler.owner.name or request.user.username
             request.session['__current_repo__'] = repo_name
 
     def create_file(self, path: str, content: str, branch: str = '') -> str:
@@ -143,7 +144,9 @@ class GitHubRepository:
             Dict: template context
         """
         context = {
+            'user': self.user,
             'repo': self.name,
+            'private': self.handler.private,
             'branch': self.branch,
             'branches': self.branches,
             'path': path,

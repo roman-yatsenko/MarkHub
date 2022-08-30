@@ -1,0 +1,28 @@
+<a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}"  title="Edit file">
+    <i class="bi bi-pencil"></i> Edit
+</a> 
+
+<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+    title="Delete file">
+    <i class="bi bi-trash"></i> Delete
+</button> 
+
+{% if private %}
+    {% if published %}
+    <a class="btn btn-outline-secondary" href="{% url 'unpublish' user_name repo branch path %}"
+        title="Unpublish file">
+        <i class="bi bi-cloud-arrow-down"></i> Unpublish
+    </a> 
+    {% else %}
+    <a class="btn btn-outline-success" href="{% url 'publish' user_name repo branch path %}" target="_blank" 
+        title="Publish file">
+        <i class="bi bi-cloud-arrow-up"></i> Publish
+    </a> 
+    {% endif %}
+{% endif %}
+{% if not private or published %}
+<a class="btn btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank" 
+    title="Share file">
+    <i class="bi bi-share"></i> Share
+</a> 
+{% endif %}

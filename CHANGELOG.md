@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - toolbar to new and edit file pages
 - PyMdown SaneHeaders Extension
+- repository type on the Home page
+- PrivatePublish model
+- show private repos if you have private_repos permission
 
 ### Changed
+- rename Share button to Publish for private repos
+- refactor file actions in file-actions component
 
 ### Deprecated
 

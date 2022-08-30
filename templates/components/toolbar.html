@@ -1,4 +1,5 @@
-<ul class="nav mt-3 gap-1">
+<ul class="nav mt-3 gap-1" id="toolbar">
+
   <li class="nav-item mt-1">
     <i class="bi bi-git"></i>
   </li>
@@ -23,6 +24,7 @@
       </select>
     </form>
   </li>
+
   <li class="nav-item mt-1 ms-2">
     <i class="bi bi-journal-bookmark"></i>
   </li>
@@ -46,23 +48,11 @@
       {% endif %}
     </ul>
   </li>
+
   {% if not decode_error and contents %}
   <li class="nav-item ms-2">
-    <a class="btn btn-sm btn-outline-primary" href="{% url 'update-file' repo path %}"  title="Edit file">
-      <i class="bi bi-pencil"></i> Edit
-    </a> 
-  </li>
-  <li class="nav-item">
-    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-        title="Delete file">
-      <i class="bi bi-trash"></i> Delete
-    </button> 
-  </li>
-  <li class="nav-item">
-    <a class="btn btn-sm btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank" 
-        title="Share file">
-      <i class="bi bi-share"></i> Share
-    </a> 
+    {% include "components/file-actions.html" %}
   </li>
   {% endif %}
+
 </ul>

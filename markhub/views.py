@@ -10,6 +10,7 @@ from django.http import FileResponse, Http404
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
@@ -17,6 +18,7 @@ from github import GithubException, UnknownObjectException
 from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
+from .models import PrivatePublish
 from .services.github_repository import GitHubRepository, get_github_handler
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
@@ -93,6 +95,66 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
 
 
 @login_required
+def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
+    """Publish file from private repository
+
+    Args:
+        request (HttpRequest): _Django request instance_
+        user (str): _user name_
+        repo (str): _repository name_
+        branch (str): _branch name_
+        path (str): _file path_
+
+    Raises:
+        Http404: _Repository not found_
+
+    Returns:
+        HttpResponse: redirect to share page
+    """
+    if repository := GitHubRepository(request, repo):
+        context = repository.get_context(path, extra={
+            'content': repository.get_contents(path, branch).decoded_content.decode('UTF-8'),
+            'owner': request.user,
+        })
+        PrivatePublish.publish_file(context)
+        messages.success(request, format_html(
+            'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
+            path, request.build_absolute_uri(reverse('share', args=[user, repo, branch, path]))
+        ))
+        return redirect('share', user=user, repo=repo, branch=branch, path=path)
+    else:
+        raise Http404("Repository not found")
+
+@login_required
+def unpublish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
+    """Unpublish file from private repository
+
+    Args:
+        request (HttpRequest): _Django request instance_
+        user (str): _user name_
+        repo (str): _repository name_
+        branch (str): _branch name_
+        path (str): _file path_
+
+    Raises:
+        Http404: _Repository not found_
+
+    Returns:
+        HttpResponse: redirect to file page with result message
+    """
+    if repository := GitHubRepository(request, repo):
+        try:
+            published_file = PrivatePublish.lookup_published_file(locals())
+            published_file.delete()
+            messages.success(request, f'File {path} was successfully unpublished')
+        except:
+            messages.warning(request, f'Error was happened during unpublishing {path}')
+        finally:
+            return redirect('file', repo=repo, branch=branch, path=path)
+    else:
+        raise Http404("Repository not found")
+
+@login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     """ Update File Controller
     
@@ -110,13 +172,17 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
             'title': 'Update file',
             'disable_branch_selector': True,
         })
+        context['published'] = bool(context['private'] and PrivatePublish.lookup_published_file(context))
         if request.method == 'POST':
             update_file_form = UpdateFileForm(request.POST)
             if update_file_form.is_valid():
-                messages.success(request, repository.update_file(
-                                            path, 
-                                            updated_content=update_file_form.cleaned_data['content']
-                ))
+                updated_content = update_file_form.cleaned_data['content']
+                if status := repository.update_file(path, updated_content):
+                    if update_file_form.cleaned_data['republish']:
+                        context['content'] = updated_content
+                        context['owner'] = request.user
+                        PrivatePublish.publish_file(context)
+                    messages.success(request, status)
                 return redirect('file', repo=repo, branch=repository.branch, path=path)
         else:
             update_file_form = UpdateFileForm(data={
@@ -139,9 +205,10 @@ class HomeView(TemplateView):
         user = self.request.user
         if user.is_authenticated and (g := get_github_handler(user)):
             context['repos'] = [
-                (repo.name, repo.created_at) 
+                (repo.name, repo.created_at, repo.private) 
                 for repo in g.get_user().get_repos() 
-                if user.username == repo.owner.login
+                if user.username == repo.owner.login 
+                and (not repo.private or user.has_perm('markhub.private_repos'))
             ]
         return context
 
@@ -208,6 +275,8 @@ class FileView(BaseRepoView):
         try:
             contents = self.repo.handler.get_contents(self.path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
+            if context.get('private'):
+                context['published'] = PrivatePublish.lookup_published_file(context)
         except GithubException as e:
             logger.error(f"File not found - {e}")
             raise Http404(
@@ -229,28 +298,6 @@ class ShareView(TemplateView):
     GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{user}/{repo}/{branch}/{path}'
     GITHUB_URL_TEMPLATE = 'https://github.com/{user}/{repo}//blob/{branch}/{path}'
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Get context data for share page view"""
-        context = super().get_context_data(**kwargs)
-        params = ('user', 'repo', 'branch', 'path')
-        if all(x in context for x in params):
-            try:
-                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
-                markdown = self._markdown()
-                context['contents'] = mark_safe(markdown.convert(urlopen(usercontent_url).read().decode('utf-8')))
-                context['toc'] = mark_safe(markdown.toc)
-            except HTTPError as e:
-                error_message = f"Url not found - {usercontent_url}"
-                logger.error(error_message)
-                raise Http404(error_message)
-            except UnicodeDecodeError as e:
-                context['decode_error'] = True
-                context['contents'] = f"Unicode decode error during openning {context['path']}"
-                logger.error(context['contents'])
-            finally:
-                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
-        return context
-
     def _markdown(self) -> Markdown:
         """
         Rerurn the Markdown object with martor settings
@@ -264,3 +311,39 @@ class ShareView(TemplateView):
             output_format="html5",
         )
     
+    def _shared_file_content(self, context: dict) -> str:
+        """Shared file content from PrivatePublish or public repository
+
+        Args:
+            context (dict): context dict with request parameters
+
+        Returns:
+            str: shared file content
+        """
+        content = None
+        if shared_file := PrivatePublish.lookup_published_file(context):
+            content = shared_file.content
+            context['private'] = True
+        else:
+            try:
+                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
+                content = urlopen(usercontent_url).read().decode('utf-8')
+            except HTTPError as e:
+                log_error_with_404(f"Url not found - {usercontent_url}")
+            except UnicodeDecodeError as e:
+                context['decode_error'] = True
+                context['contents'] = f"Unicode decode error during openning {context['path']}"
+                logger.error(context['contents'])
+            finally:
+                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
+        return content
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for share page view"""
+        context = super().get_context_data(**kwargs)
+        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
+            if content := self._shared_file_content(context):
+                markdown = self._markdown()
+                context['contents'] = mark_safe(markdown.convert(content))
+                context['toc'] = mark_safe(markdown.toc)
+        return context
