@@ -11,10 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - repository type on the Home page
 - PrivatePublish model
 - show private repos if you have private_repos permission
+- repository type on the Home page
+- PrivatePublish model
+- private_repos permission to show private repos
+- add publish_file_ctr and unpublish_file_ctr
+- private files publishing
+- Publish/Unpublish button for shared private files
+- Republish checkbox in the edit page
 
 ### Changed
 - rename Share button to Publish for private repos
 - refactor file actions in file-actions component
+- Publish button icon
 
 ### Deprecated
 
