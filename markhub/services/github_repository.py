@@ -217,3 +217,20 @@ class GitHubRepository:
             )
         except UnknownObjectException as e:
             log_error_with_404(f"File not updated - {e}")
+
+
+def get_repository_or_404(request: HttpRequest, repo: str) -> GitHubRepository:
+    """Get GitHubRepository instance or raise 404
+
+    Args:
+        request (HttpRequest): Django request instance
+        repo (str): Repository name
+
+    Raises:
+        Http404: if GitHubRepository is not created
+
+    Returns:
+        GitHubRepository: GitHubRepository instance
+    """
+    if repository := GitHubRepository(request, repo): return repository
+    raise Http404("Repository not found")
