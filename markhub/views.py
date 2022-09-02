@@ -20,7 +20,8 @@ from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
 from .models import PrivatePublish
-from .services.github_repository import GitHubRepository, get_github_handler
+from .services.github_repository import (GitHubRepository, get_github_handler,
+                                         get_repository_or_404)
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
 
@@ -37,16 +38,14 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-    if repository := GitHubRepository(request, repo):
-        messages.success(request, repository.delete_file(path))
-        if path:
-            path_object = PurePosixPath(path)
-            parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
-            return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
-        else:
-            return redirect('repo', repo=repo)
+    repository = get_repository_or_404(request, repo)
+    messages.success(request, repository.delete_file(path))
+    if path:
+        path_object = PurePosixPath(path)
+        parent_path = '' if str(path_object.parent) == '.' else str(path_object.parent)
+        return redirect('repo', repo=repo, branch=repository.branch, path=parent_path)
     else:
-        raise Http404("Repository not found")
+        return redirect('repo', repo=repo)
 
 
 def get_webmanifest(request: HttpRequest) -> FileResponse:
@@ -73,26 +72,24 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     Returns:
         rendered page
     """
-    if repository := GitHubRepository(request, repo):
-        context = repository.get_context(path, extra={
-            'title': 'New file in',
-            'disable_branch_selector': True,
-        })
-        if request.method == 'POST':
-            new_file_form = NewFileForm(request.POST)
-            if new_file_form.is_valid():
-                newfile_path: str = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}'
-                messages.success(request, repository.create_file(
-                                            path=newfile_path, 
-                                            content=new_file_form.cleaned_data['content']
-                ))
-                return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
-        else:
-            new_file_form = NewFileForm()
-        context['form'] = new_file_form
-        return render(request, 'edit_file.html', context)
+    repository = get_repository_or_404(request, repo)
+    context = repository.get_context(path, extra={
+        'title': 'New file in',
+        'disable_branch_selector': True,
+    })
+    if request.method == 'POST':
+        new_file_form = NewFileForm(request.POST)
+        if new_file_form.is_valid():
+            newfile_path: str = f'{path + "/" if path else ""}{new_file_form.cleaned_data["filename"]}'
+            messages.success(request, repository.create_file(
+                                        path=newfile_path, 
+                                        content=new_file_form.cleaned_data['content']
+            ))
+            return redirect('file', repo=repo, branch=repository.branch, path=newfile_path)
     else:
-        raise Http404("Repository not found")
+        new_file_form = NewFileForm()
+    context['form'] = new_file_form
+    return render(request, 'edit_file.html', context)
 
 
 @login_required
@@ -112,19 +109,18 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
     Returns:
         HttpResponse: redirect to share page
     """
-    if repository := GitHubRepository(request, repo):
-        context = repository.get_context(path, extra={
-            'content': repository.get_contents(path, branch).decoded_content.decode('UTF-8'),
-            'owner': request.user,
-        })
-        PrivatePublish.publish_file(context)
-        messages.success(request, format_html(
-            'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
-            path, request.build_absolute_uri(reverse('share', args=[user, repo, branch, path]))
-        ))
-        return redirect('share', user=user, repo=repo, branch=branch, path=path)
-    else:
-        raise Http404("Repository not found")
+    repository = get_repository_or_404(request, repo)
+    context = repository.get_context(path, extra={
+        'content': repository.get_contents(path, branch).decoded_content.decode('UTF-8'),
+        'owner': request.user,
+    })
+    PrivatePublish.publish_file(context)
+    messages.success(request, format_html(
+        'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
+        path, request.build_absolute_uri(reverse('share', args=[user, repo, branch, path]))
+    ))
+    return redirect('share', user=user, repo=repo, branch=branch, path=path)
+
 
 @login_required
 def unpublish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
@@ -143,17 +139,16 @@ def unpublish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, 
     Returns:
         HttpResponse: redirect to file page with result message
     """
-    if repository := GitHubRepository(request, repo):
-        try:
-            published_file = PrivatePublish.lookup_published_file(locals())
-            published_file.delete()
-            messages.success(request, f'File {path} was successfully unpublished')
-        except:
-            messages.warning(request, f'Error was happened during unpublishing {path}')
-        finally:
-            return redirect('file', repo=repo, branch=branch, path=path)
-    else:
-        raise Http404("Repository not found")
+    repository = get_repository_or_404(request, repo)
+    try:
+        published_file = PrivatePublish.lookup_published_file(locals())
+        published_file.delete()
+        messages.success(request, f'File {path} was successfully unpublished')
+    except:
+        messages.warning(request, f'Error was happened during unpublishing {path}')
+    finally:
+        return redirect('file', repo=repo, branch=branch, path=path)
+
 
 @login_required
 def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
@@ -167,33 +162,31 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-    if repository := GitHubRepository(request, repo):
-        context = repository.get_context(path, extra={
-            'update': True,
-            'title': 'Update file',
-            'disable_branch_selector': True,
-        })
-        context['published'] = bool(context['private'] and PrivatePublish.lookup_published_file(context))
-        if request.method == 'POST':
-            update_file_form = UpdateFileForm(request.POST)
-            if update_file_form.is_valid():
-                updated_content = update_file_form.cleaned_data['content']
-                if status := repository.update_file(path, updated_content):
-                    if update_file_form.cleaned_data['republish']:
-                        context['content'] = updated_content
-                        context['owner'] = request.user
-                        PrivatePublish.publish_file(context)
-                    messages.success(request, status)
-                return redirect('file', repo=repo, branch=repository.branch, path=path)
-        else:
-            update_file_form = UpdateFileForm(data={
-                'filename': path,
-                'content': repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8'),
-            })
-        context['form'] = update_file_form
-        return render(request, 'edit_file.html', context)
+    repository = get_repository_or_404(request, repo)
+    context = repository.get_context(path, extra={
+        'update': True,
+        'title': 'Update file',
+        'disable_branch_selector': True,
+    })
+    context['published'] = bool(context['private'] and PrivatePublish.lookup_published_file(context))
+    if request.method == 'POST':
+        update_file_form = UpdateFileForm(request.POST)
+        if update_file_form.is_valid():
+            updated_content = update_file_form.cleaned_data['content']
+            if status := repository.update_file(path, updated_content):
+                if update_file_form.cleaned_data['republish']:
+                    context['content'] = updated_content
+                    context['owner'] = request.user
+                    PrivatePublish.publish_file(context)
+                messages.success(request, status)
+            return redirect('file', repo=repo, branch=repository.branch, path=path)
     else:
-        raise Http404("Repository not found")
+        update_file_form = UpdateFileForm(data={
+            'filename': path,
+            'content': repository.get_contents(path, repository.branch).decoded_content.decode('UTF-8'),
+        })
+    context['form'] = update_file_form
+    return render(request, 'edit_file.html', context)
 
 
 class HomeView(TemplateView):
