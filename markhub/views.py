@@ -93,15 +93,15 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
 
 
 @login_required
-def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
+def publish_file_ctr(request: HttpRequest, username: str, repo: str, branch: str, path: str) -> HttpResponse:
     """Publish file from private repository
 
     Args:
-        request (HttpRequest): _Django request instance_
-        user (str): _user name_
-        repo (str): _repository name_
-        branch (str): _branch name_
-        path (str): _file path_
+        request (HttpRequest): Django request instance
+        username (str): user name
+        repo (str): repository name
+        branch (str): branch name
+        path (str): file path
 
     Raises:
         Http404: _Repository not found_
@@ -117,21 +117,21 @@ def publish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, pa
     PrivatePublish.publish_file(context)
     messages.success(request, format_html(
         'File {0} was successfully published with the link <a href="{1}" target="_blank">{1}</a>',
-        path, request.build_absolute_uri(reverse('share', args=[user, repo, branch, path]))
+        path, request.build_absolute_uri(reverse('share', args=[username, repo, branch, path]))
     ))
-    return redirect('share', user=user, repo=repo, branch=branch, path=path)
+    return redirect('share', username=username, repo=repo, branch=branch, path=path)
 
 
 @login_required
-def unpublish_file_ctr(request: HttpRequest, user: str, repo: str, branch: str, path: str) -> HttpResponse:
+def unpublish_file_ctr(request: HttpRequest, username: str, repo: str, branch: str, path: str) -> HttpResponse:
     """Unpublish file from private repository
 
     Args:
         request (HttpRequest): _Django request instance_
-        user (str): _user name_
-        repo (str): _repository name_
-        branch (str): _branch name_
-        path (str): _file path_
+        username (str): user name
+        repo (str): repository name
+        branch (str): branch name
+        path (str): file path
 
     Raises:
         Http404: _Repository not found_
@@ -213,7 +213,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
     def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
         super().setup(request, *args, **kwargs)
         if request.user.username:
-            self.user_name = request.user.username
+            self.username = request.user.username
             self.repo = GitHubRepository(request, kwargs['repo'])
             self.path = kwargs.get('path', '')
             self.branch = kwargs.get('branch', self.repo.branch)
@@ -224,7 +224,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
         """Get context data for repository view"""
         context = super().get_context_data(**kwargs)
         context.update(self.repo.get_context(self.path, extra={
-            'user_name': self.user_name,
+            'username': self.username,
         }))
         return context
 
@@ -277,7 +277,7 @@ class FileView(BaseRepoView):
         except GithubException as e:
             logger.error(f"File not found - {e}")
             raise Http404(
-                "The '{user_name}/{repo}' repository doesn't contain the '{path}' path in '{branch}'.".format(
+                "The '{username}/{repo}' repository doesn't contain the '{path}' path in '{branch}'.".format(
                     **context
                 )
             )
@@ -292,8 +292,8 @@ class FileView(BaseRepoView):
 class ShareView(TemplateView):
     """ Share page view """
     template_name = 'share.html'
-    GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{user}/{repo}/{branch}/{path}'
-    GITHUB_URL_TEMPLATE = 'https://github.com/{user}/{repo}//blob/{branch}/{path}'
+    GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{username}/{repo}/{branch}/{path}'
+    GITHUB_URL_TEMPLATE = 'https://github.com/{username}/{repo}//blob/{branch}/{path}'
 
     def _markdown(self) -> Markdown:
         """
@@ -338,7 +338,7 @@ class ShareView(TemplateView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
         context = super().get_context_data(**kwargs)
-        if all(x in context for x in ('user', 'repo', 'branch', 'path')):
+        if all(x in context for x in ('username', 'repo', 'branch', 'path')):
             if content := self._shared_file_content(context):
                 markdown = self._markdown()
                 context['contents'] = mark_safe(markdown.convert(content))

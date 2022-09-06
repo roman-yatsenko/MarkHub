@@ -57,7 +57,7 @@ class GitHubRepository:
                 except UnknownObjectException as e:
                     log_error_with_404(f"Repository not found - {e}")
         if self.handler:
-            self.user = self.handler.owner.name or request.user.username
+            self.username = self.handler.owner.name or request.user.username
             request.session['__current_repo__'] = repo_name
 
     def create_file(self, path: str, content: str, branch: str = '') -> str:
@@ -144,7 +144,7 @@ class GitHubRepository:
             Dict: template context
         """
         context = {
-            'user': self.user,
+            'username': self.username,
             'repo': self.name,
             'private': self.handler.private,
             'branch': self.branch,

@@ -63,7 +63,7 @@ class PrivatePublish(models.Model):
         """
         try:
             return cls.objects.get(
-                user=context.get('user_name') or context.get('user'),
+                user=context.get('username'),
                 repo=context['repo'],
                 branch=context['branch'],
                 path=context['path']
@@ -84,7 +84,7 @@ class PrivatePublish(models.Model):
         if published_file := cls.lookup_published_file(context):
             published_file.delete()
         published_file = PrivatePublish(
-            user=context['user'], repo=context['repo'], branch=context['branch'], path=context['path'],
+            user=context['username'], repo=context['repo'], branch=context['branch'], path=context['path'],
             content=context['content'], owner=context['owner']
         )
         published_file.save()
