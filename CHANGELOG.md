@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish/Unpublish button for shared private files
 - Republish checkbox in the edit page
 - 403 page template
+
 ### Changed
 - rename Share button to Publish for private repos
 - refactor file actions in file-actions component
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - error log
 - 500 error for files from private repos without login
+- user and username conflict in context
 
 ### Security
 
