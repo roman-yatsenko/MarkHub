@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.3.0] - 2022-09-07
+### Added
 - toolbar to new and edit file pages
 - PyMdown SaneHeaders Extension
 - repository type on the Home page
@@ -26,16 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publish button icon
 - refactor controllers with get_repository_or_404 in 
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 - error log
 - 500 error for files from private repos without login
 - user and username conflict in context
-
-### Security
 
 ## [0.2.2] - 2022-07-27
 ### Added
