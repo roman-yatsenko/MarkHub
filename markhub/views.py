@@ -21,7 +21,7 @@ from markdown import Markdown
 from .forms import NewFileForm, UpdateFileForm
 from .models import PrivatePublish
 from .services.github_repository import (GitHubRepository, get_github_handler,
-                                         get_repository_or_404)
+                                         get_repository_or_error)
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                        MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
 
@@ -38,7 +38,7 @@ def delete_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-    repository = get_repository_or_404(request, repo)
+    repository = get_repository_or_error(request, repo)
     messages.success(request, repository.delete_file(path))
     if path:
         path_object = PurePosixPath(path)
@@ -72,7 +72,7 @@ def new_file_ctr(request: HttpRequest, repo: str, path: str = '') -> HttpRespons
     Returns:
         rendered page
     """
-    repository = get_repository_or_404(request, repo)
+    repository = get_repository_or_error(request, repo)
     context = repository.get_context(path, extra={
         'title': 'New file in',
         'disable_branch_selector': True,
@@ -109,7 +109,7 @@ def publish_file_ctr(request: HttpRequest, username: str, repo: str, branch: str
     Returns:
         HttpResponse: redirect to share page
     """
-    repository = get_repository_or_404(request, repo)
+    repository = get_repository_or_error(request, repo)
     context = repository.get_context(path, extra={
         'content': repository.get_contents(path, branch).decoded_content.decode('UTF-8'),
         'owner': request.user,
@@ -139,7 +139,7 @@ def unpublish_file_ctr(request: HttpRequest, username: str, repo: str, branch: s
     Returns:
         HttpResponse: redirect to file page with result message
     """
-    repository = get_repository_or_404(request, repo)
+    repository = get_repository_or_error(request, repo)
     try:
         published_file = PrivatePublish.lookup_published_file(locals())
         published_file.delete()
@@ -162,7 +162,7 @@ def update_file_ctr(request: HttpRequest, repo: str, path: str) -> HttpResponse:
     Returns:
         rendered page
     """
-    repository = get_repository_or_404(request, repo)
+    repository = get_repository_or_error(request, repo)
     context = repository.get_context(path, extra={
         'update': True,
         'title': 'Update file',
@@ -214,7 +214,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
         super().setup(request, *args, **kwargs)
         if request.user.username:
             self.username = request.user.username
-            self.repo = GitHubRepository(request, kwargs['repo'])
+            self.repo = get_repository_or_error(request, kwargs['repo'])
             self.path = kwargs.get('path', '')
             self.branch = kwargs.get('branch', self.repo.branch)
         else:
