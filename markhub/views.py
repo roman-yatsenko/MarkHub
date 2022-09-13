@@ -198,12 +198,12 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         if user.is_authenticated and (g := get_github_handler(user)):
-            context['repos'] = [
-                (repo.name, repo.created_at, repo.private) 
-                for repo in g.get_user().get_repos() 
-                if user.username == repo.owner.login 
-                and (not repo.private or user.has_perm('markhub.private_repos'))
-            ]
+            context['repos'] = sorted([
+                                    (repo.name, repo.pushed_at, repo.private) 
+                                    for repo in g.get_user().get_repos() 
+                                    if user.username == repo.owner.login 
+                                    and (not repo.private or user.has_perm('markhub.private_repos'))
+                                ], key=lambda item: item[1], reverse=True)
         return context
 
 
