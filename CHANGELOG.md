@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- private share bug for users with full name
+- direct private repo access with no permission
 
 ### Security
 
