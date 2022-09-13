@@ -14,10 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
-- private share bug for users with full name
-- direct private repo access with no permission
 
 ### Security
+
+## [0.3.1] - 2022-09-13
+### Fixed
+- private share bug for users with full name
+- direct private repo access with no permission
 
 ## [0.3.0] - 2022-09-07
 ### Added
