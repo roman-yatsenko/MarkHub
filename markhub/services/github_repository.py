@@ -2,6 +2,7 @@ from pathlib import Path, PurePosixPath
 from typing import Dict, List, Optional, Union
 
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.http.request import HttpRequest
 from django.utils.html import format_html
@@ -57,7 +58,7 @@ class GitHubRepository:
                 except UnknownObjectException as e:
                     log_error_with_404(f"Repository not found - {e}")
         if self.handler:
-            self.username = self.handler.owner.name or request.user.username
+            self.username = self.handler.owner.login or request.user.username
             request.session['__current_repo__'] = repo_name
 
     def create_file(self, path: str, content: str, branch: str = '') -> str:
@@ -219,7 +220,7 @@ class GitHubRepository:
             log_error_with_404(f"File not updated - {e}")
 
 
-def get_repository_or_404(request: HttpRequest, repo: str) -> GitHubRepository:
+def get_repository_or_error(request: HttpRequest, repo: str) -> GitHubRepository:
     """Get GitHubRepository instance or raise 404
 
     Args:
@@ -228,9 +229,13 @@ def get_repository_or_404(request: HttpRequest, repo: str) -> GitHubRepository:
 
     Raises:
         Http404: if GitHubRepository is not created
+        PermissionDenied: if user has no permission to work with private repositories
 
     Returns:
         GitHubRepository: GitHubRepository instance
     """
-    if repository := GitHubRepository(request, repo): return repository
+    if repository := GitHubRepository(request, repo): 
+        if repository.handler.private and not request.user.has_perm('markhub.private_repos'):
+            raise PermissionDenied
+        return repository
     raise Http404("Repository not found")
