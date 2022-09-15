@@ -253,9 +253,7 @@ class RepoView(BaseRepoView):
                 raise Http404(f"Path not found - {e}")
         if isinstance(contents, list):
             context['repo_contents'] = contents
-            contents.sort(
-                key=lambda item: item.type + item.name
-            )
+            contents.sort(key=lambda item: item.type + item.name)
         elif contents:
             context['repo_contents'] = [contents]
         context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'

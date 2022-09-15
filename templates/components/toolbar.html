@@ -49,6 +49,15 @@
     </ul>
   </li>
 
+  {% if history_url %}
+  <li class="nav-item ms-2">
+    <a class="btn btn-outline-dark" href="{{ history_url }}"  title="Commits log" target="_blank">
+      <i class="bi bi-clock-history"></i> 
+      History
+    </a> 
+  </li>
+  {% endif %}
+
   {% if not decode_error and contents %}
   <li class="nav-item ms-2">
     {% include "components/file-actions.html" %}

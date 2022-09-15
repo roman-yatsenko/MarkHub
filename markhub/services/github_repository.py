@@ -156,6 +156,7 @@ class GitHubRepository:
             context['path_parts'] = self.get_path_parts(path)
             context['parent_path'] = str(Path(path).parent)
         context.update(extra)
+        context['history_url'] = 'https://github.com/{username}/{repo}/commits/{branch}/{path}'.format(**context)
         return context
 
     def get_path_parts(self, path: str) -> Dict:
