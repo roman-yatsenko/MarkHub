@@ -58,10 +58,20 @@
   </li>
   {% endif %}
 
-  {% if not decode_error and contents %}
   <li class="nav-item ms-2">
+  {% if not decode_error and contents %}
     {% include "components/file-actions.html" %}
-  </li>
+  {% elif not disable_branch_selector %}
+    <a class="btn btn-outline-primary" title="Create a new file in this folder"
+    {% if path %}
+      href="{% url 'new-file' repo path %}"
+    {% else %}
+      href="{% url 'new-file' repo %}"
+    {% endif %}>
+    <i class="bi-file-plus"></i> 
+    New file
+    </a>
   {% endif %}
+  </li>
 
 </ul>

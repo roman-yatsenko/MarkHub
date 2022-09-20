@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - history button for repo, repo path and file
 
 ### Changed
+- move New file button to the toolbar
 
 ### Deprecated
 
