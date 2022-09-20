@@ -272,6 +272,10 @@ class RepoView(BaseRepoView):
         context = super().get_context_data(**kwargs)
         if not self.path:
             contents = self.repo.handler.get_contents('', self.branch)
+            readme_file = list(map(
+                lambda item: item.type != 'dir' and Path(item.name).name.lower() in ('readme.md', 'index.md'), 
+                contents
+            ))
         else:
             try:
                 contents = self.repo.handler.get_dir_contents(self.path, self.branch)
