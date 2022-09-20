@@ -235,6 +235,33 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
             self.repo.save_current_branch(request, self.branch)
         return self.get(request, *args, **kwargs)
 
+    def _add_file_contents(self, context: dict, path: str) -> None:
+        """Add file contents to context
+
+        Args:
+            context (dict): template context
+            path (str): file path in repository
+
+        Raises:
+            Http404: if file not found in repository
+        """
+        try:
+            contents = self.repo.handler.get_contents(path, context['branch'])
+            context['contents'] = contents.decoded_content.decode('UTF-8')
+            context['html_url'] = contents.html_url
+            if context.get('private'):
+                context['published'] = PrivatePublish.lookup_published_file(context)
+        except GithubException as e:
+            logger.error(f"File not found - {e}")
+            raise Http404(
+                "The '{username}/{repo}' repository doesn't contain the '{path}' path in '{branch}'.".format(
+                    **context
+                )
+            )
+        except UnicodeDecodeError as e:
+            context['decode_error'] = True
+            context['contents'] = f"Unicode decode error during openning {self.path}"
+            logger.error(context['contents'])
 
 class RepoView(BaseRepoView):
     """ Repository view """
@@ -267,23 +294,7 @@ class FileView(BaseRepoView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for file view"""
         context = super().get_context_data(**kwargs)
-        try:
-            contents = self.repo.handler.get_contents(self.path, context['branch'])
-            context['contents'] = contents.decoded_content.decode('UTF-8')
-            if context.get('private'):
-                context['published'] = PrivatePublish.lookup_published_file(context)
-        except GithubException as e:
-            logger.error(f"File not found - {e}")
-            raise Http404(
-                "The '{username}/{repo}' repository doesn't contain the '{path}' path in '{branch}'.".format(
-                    **context
-                )
-            )
-        except UnicodeDecodeError as e:
-            context['decode_error'] = True
-            context['contents'] = f"Unicode decode error during openning {self.path}"
-            logger.error(context['contents'])
-        context['html_url'] = contents.html_url
+        self._add_file_contents(context, self.path)
         return context
 
 
