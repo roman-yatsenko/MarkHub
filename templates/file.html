@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% load static %}
-{% load martortags %}
 
 {% block title %}
   {% if user.is_authenticated %}
@@ -17,16 +16,10 @@
 {% block content %}
 <div class="container">
   {% include "components/toolbar.html" %}
-  {% if contents %}
-  <div class="mb-3 martor-content border">
-    <div class="martor-preview">
-      {{ contents|safe_markdown }}
-    </div>
-  </div>
-  {% endif %}
+  {% include "components/file-contents.html" %}
   {% if not decode_error %}
   <p>
-    {% include "components/file-actions.html" %}
+  {% include "components/file-actions.html" %}
   </p>
   {% endif %}
   <p>

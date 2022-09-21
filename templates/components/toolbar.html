@@ -59,7 +59,7 @@
   {% endif %}
 
   <li class="nav-item ms-2">
-  {% if not decode_error and contents %}
+  {% if not decode_error and contents and path %}
     {% include "components/file-actions.html" %}
   {% elif not disable_branch_selector %}
     <a class="btn btn-outline-primary" title="Create a new file in this folder"

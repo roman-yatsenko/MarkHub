@@ -272,19 +272,21 @@ class RepoView(BaseRepoView):
         context = super().get_context_data(**kwargs)
         if not self.path:
             contents = self.repo.handler.get_contents('', self.branch)
-            readme_file = list(map(
-                lambda item: item.type != 'dir' and Path(item.name).name.lower() in ('readme.md', 'index.md'), 
-                contents
-            ))
+            context['readme_file'] = sorted([
+                item.name
+                for item in contents
+                if item.type != 'dir' and item.name.lower() in ('readme.md', 'index.md')
+            ], reverse=True)[0]
+            if context['readme_file']:
+                self._add_file_contents(context, context['readme_file'])
         else:
             try:
                 contents = self.repo.handler.get_dir_contents(self.path, self.branch)
             except (UnknownObjectException, GithubException) as e:
-                logger.error(f"Path not found - {e}")
-                raise Http404(f"Path not found - {e}")
+                log_error_with_404(f"Path not found - {e}")
         if isinstance(contents, list):
-            context['repo_contents'] = contents
             contents.sort(key=lambda item: item.type + item.name)
+            context['repo_contents'] = contents
         elif contents:
             context['repo_contents'] = [contents]
         context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'

@@ -6,6 +6,11 @@
   {% endif %}
 {% endblock %}
 
+{% block css %}
+  <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+{% endblock %}
+
 {% block content %}
 <div class="container">
   {% include "components/toolbar.html" %}
@@ -38,5 +43,12 @@
     <a href="{{ html_url }}" target="_blank"  title="Open folder in the GitHub">Open in the GitHub</a> 
     <i class="bi-box-arrow-up-right"></i>
   </p>
+
+  {% include "components/file-contents.html" %}
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/anchor-links.js' %}" async></script>
 {% endblock %}
