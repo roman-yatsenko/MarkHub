@@ -198,12 +198,12 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         if user.is_authenticated and (g := get_github_handler(user)):
-            context['repos'] = [
-                (repo.name, repo.created_at, repo.private) 
-                for repo in g.get_user().get_repos() 
-                if user.username == repo.owner.login 
-                and (not repo.private or user.has_perm('markhub.private_repos'))
-            ]
+            context['repos'] = sorted([
+                                    (repo.name, repo.pushed_at, repo.private) 
+                                    for repo in g.get_user().get_repos() 
+                                    if user.username == repo.owner.login 
+                                    and (not repo.private or user.has_perm('markhub.private_repos'))
+                                ], key=lambda item: item[1], reverse=True)
         return context
 
 
@@ -235,43 +235,20 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
             self.repo.save_current_branch(request, self.branch)
         return self.get(request, *args, **kwargs)
 
+    def _add_file_contents(self, context: dict, path: str) -> None:
+        """Add file contents to context
 
-class RepoView(BaseRepoView):
-    """ Repository view """
-    template_name = 'repo.html'
+        Args:
+            context (dict): template context
+            path (str): file path in repository
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Get context data for repository view"""
-        context = super().get_context_data(**kwargs)
-        if not self.path:
-            contents = self.repo.handler.get_contents('', self.branch)
-        else:
-            try:
-                contents = self.repo.handler.get_dir_contents(self.path, self.branch)
-            except (UnknownObjectException, GithubException) as e:
-                logger.error(f"Path not found - {e}")
-                raise Http404(f"Path not found - {e}")
-        if isinstance(contents, list):
-            context['repo_contents'] = contents
-            contents.sort(
-                key=lambda item: item.type + item.name
-            )
-        elif contents:
-            context['repo_contents'] = [contents]
-        context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
-        return context
-
-
-class FileView(BaseRepoView):
-    """Repository file view"""
-    template_name = 'file.html'
-
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Get context data for file view"""
-        context = super().get_context_data(**kwargs)
+        Raises:
+            Http404: if file not found in repository
+        """
         try:
-            contents = self.repo.handler.get_contents(self.path, context['branch'])
+            contents = self.repo.handler.get_contents(path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
+            context['html_url'] = contents.html_url
             if context.get('private'):
                 context['published'] = PrivatePublish.lookup_published_file(context)
         except GithubException as e:
@@ -285,7 +262,46 @@ class FileView(BaseRepoView):
             context['decode_error'] = True
             context['contents'] = f"Unicode decode error during openning {self.path}"
             logger.error(context['contents'])
-        context['html_url'] = contents.html_url
+
+class RepoView(BaseRepoView):
+    """ Repository view """
+    template_name = 'repo.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for repository view"""
+        context = super().get_context_data(**kwargs)
+        if not self.path:
+            contents = self.repo.handler.get_contents('', self.branch)
+            readme_file = sorted([
+                item.name
+                for item in contents
+                if item.type != 'dir' and item.name.lower() in ('readme.md', 'index.md')
+            ], key=lambda item: item.lower(), reverse=True)
+            if readme_file:
+                context['readme_file'] = readme_file[0]
+                self._add_file_contents(context, context['readme_file'])
+        else:
+            try:
+                contents = self.repo.handler.get_dir_contents(self.path, self.branch)
+            except (UnknownObjectException, GithubException) as e:
+                log_error_with_404(f"Path not found - {e}")
+        if isinstance(contents, list):
+            contents.sort(key=lambda item: item.type + item.name)
+            context['repo_contents'] = contents
+        elif contents:
+            context['repo_contents'] = [contents]
+        context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
+        return context
+
+
+class FileView(BaseRepoView):
+    """Repository file view"""
+    template_name = 'file.html'
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """Get context data for file view"""
+        context = super().get_context_data(**kwargs)
+        self._add_file_contents(context, self.path)
         return context
 
 

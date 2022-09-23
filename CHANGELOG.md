@@ -6,8 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- sort repos on the homepage by last update
+- history button for repo, repo path and file
+- README.md or index.md rendering at the repo root
 
 ### Changed
+- move New file button to the toolbar
 
 ### Deprecated
 

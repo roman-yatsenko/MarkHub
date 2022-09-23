@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}
   {% if user.is_authenticated %}
     {{ repo }} - 
   {% endif %}
+{% endblock %}
+
+{% block css %}
+  <link href="{% static 'plugins/css/ace.min.css' %}" type="text/css" media="all" rel="stylesheet" />
+  <link href="{% static 'martor/css/martor.bootstrap.min.css' %}" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -33,20 +40,18 @@
     </li>
     {% endfor %}
   </div>
-  <p class="mt-3">
-    <a class="btn btn-outline-primary" title="Create a new file in this folder"
-      {% if path %}
-        href="{% url 'new-file' repo path %}"
-      {% else %}
-        href="{% url 'new-file' repo %}"
-      {% endif %}>
-      <i class="bi-file-plus"></i> 
-      New file
-    </a>
-  </p>
+  
   <p>
     <a href="{{ html_url }}" target="_blank"  title="Open folder in the GitHub">Open in the GitHub</a> 
     <i class="bi-box-arrow-up-right"></i>
   </p>
+
+  {% include "components/file-contents.html" %}
+  {% include "components/back-to-top.html" %}
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/mathjax.js' %}" async></script>
+<script type="text/javascript" src="{% static 'js/anchor-links.js' %}" async></script>
 {% endblock %}

@@ -1,0 +1,12 @@
+{% load martortags %}
+
+{% if contents %}
+  <div class="mb-3 martor-content border">
+    {% if readme_file %}
+    <h3 class="m-3">{{ readme_file }}</h3>
+    {% endif %}
+    <div class="martor-preview">
+        {{ contents|safe_markdown }}
+    </div>
+  </div>
+{% endif %}
