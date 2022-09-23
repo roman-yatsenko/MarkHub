@@ -6,12 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- sort repos on the homepage by last update
-- history button for repo, repo path and file
-- README.md or index.md rendering at the repo root
 
 ### Changed
-- move New file button to the toolbar
 
 ### Deprecated
 
@@ -20,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [0.3.2] - 2022-09-23
+### Added
+- sort repos on the homepage by last update
+- history button for repo, repo path and file
+- README.md or index.md rendering at the repo root
+
+### Changed
+- move New file button to the toolbar
 
 ## [0.3.1] - 2022-09-13
 ### Fixed
