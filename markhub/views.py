@@ -272,12 +272,13 @@ class RepoView(BaseRepoView):
         context = super().get_context_data(**kwargs)
         if not self.path:
             contents = self.repo.handler.get_contents('', self.branch)
-            context['readme_file'] = sorted([
+            readme_file = sorted([
                 item.name
                 for item in contents
                 if item.type != 'dir' and item.name.lower() in ('readme.md', 'index.md')
-            ], key=lambda item: item.lower(), reverse=True)[0]
-            if context['readme_file']:
+            ], key=lambda item: item.lower(), reverse=True)
+            if readme_file:
+                context['readme_file'] = readme_file[0]
                 self._add_file_contents(context, context['readme_file'])
         else:
             try:
