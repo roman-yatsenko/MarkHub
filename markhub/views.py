@@ -276,7 +276,7 @@ class RepoView(BaseRepoView):
                 item.name
                 for item in contents
                 if item.type != 'dir' and item.name.lower() in ('readme.md', 'index.md')
-            ], reverse=True)[0]
+            ], key=lambda item: item.lower(), reverse=True)[0]
             if context['readme_file']:
                 self._add_file_contents(context, context['readme_file'])
         else:

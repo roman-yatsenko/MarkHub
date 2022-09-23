@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}
   {% if user.is_authenticated %}
     {{ repo }} - 
@@ -45,6 +47,7 @@
   </p>
 
   {% include "components/file-contents.html" %}
+  {% include "components/back-to-top.html" %}
 </div>
 {% endblock %}
 
