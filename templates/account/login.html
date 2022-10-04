@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load account socialaccount %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-4 border border-secondary rounded">
+
+        <h1>Sign In</h1>
+
+        {% get_providers as socialaccount_providers %}
+        
+        {% if socialaccount_providers %}
+        <p>Please sign in with one of your existing GitHub accounts.</p>
+        
+        <div class="socialaccount_ballot">
+          <ul class="socialaccount_providers">
+            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+          </ul>
+        </div>
+        
+        {% else %}
+        <p>If you have not created an account yet, then please
+        <a href="{{ signup_url }}">sign up</a> first.</p>
+        {% endif %}
+        
+        <form class="login" method="POST" action="{% url 'account_login' %}">
+          {% csrf_token %}
+          {{ form.as_p }}
+          {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+          <button class="btn btn-success" type="submit">"Sign In"</button>
+        </form>
+      
+    </div>  
+  </div>
+</div>
+{% endblock %}
