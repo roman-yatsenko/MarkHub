@@ -33,7 +33,7 @@
           <i class="bi-folder-fill"></i>  
       {% else %}
         <a href ="{% url 'file' repo branch content.path %}" class="text-decoration-none" title="Open file" >
-          <i class="bi-file-text"></i>  
+          <i class="{{ content.icon }}"></i>  
       {% endif %}
           {{ content.name }}
         </a>

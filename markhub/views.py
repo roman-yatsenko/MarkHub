@@ -20,6 +20,7 @@ from markdown import Markdown
 
 from .forms import NewFileForm, UpdateFileForm
 from .models import PrivatePublish
+from .services.bootstrap_icons import FILETYPE_EXTENSIONS
 from .services.github_repository import (GitHubRepository, get_github_handler,
                                          get_repository_or_error)
 from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
@@ -290,6 +291,9 @@ class RepoView(BaseRepoView):
             context['repo_contents'] = contents
         elif contents:
             context['repo_contents'] = [contents]
+        for content in contents:
+            extension = Path(content.name).suffix[1:]
+            content.icon = f'bi-filetype-{extension}' if extension in FILETYPE_EXTENSIONS else 'bi-file-earmark'
         context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
         return context
 
