@@ -1,4 +1,4 @@
-FILETYPE_ICONS = \ 
+FILETYPE_ICONS = \
 """filetype-aac
 filetype-ai
 filetype-bmp
@@ -49,4 +49,4 @@ filetype-xlsx
 filetype-xml
 filetype-yml"""
 
-FILETYPE_EXTENSIONS = [x.split('-')[1] for x in FILETYPE_ICONS]
+FILETYPE_EXTENSIONS = [x.split('-')[1] for x in FILETYPE_ICONS.split('\n')]

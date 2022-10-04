@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Alt+s shortcut for Update/Create button
+- Filetype icons
+
 ### Changed
 
 ### Deprecated

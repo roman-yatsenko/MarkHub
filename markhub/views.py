@@ -293,7 +293,7 @@ class RepoView(BaseRepoView):
             context['repo_contents'] = [contents]
         for content in contents:
             extension = Path(content.name).suffix[1:]
-            content.icon = f'bi-filetype-{extension}' if extension in FILETYPE_EXTENSIONS else 'bi-file-text'
+            content.icon = f'bi-filetype-{extension}' if extension in FILETYPE_EXTENSIONS else 'bi-file-earmark'
         context['html_url'] = f'{self.repo.handler.html_url}/tree/{self.branch}/{self.path if self.path else ""}'
         return context
 
