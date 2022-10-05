@@ -12,26 +12,32 @@
         {% get_providers as socialaccount_providers %}
         
         {% if socialaccount_providers %}
-        <p>Please sign in with one of your existing GitHub accounts.</p>
+        <p>Please sign in with one of your existing GitHub accounts:</p>
         
         <div class="socialaccount_ballot">
           <ul class="socialaccount_providers">
             {% include "socialaccount/snippets/provider_list.html" with process="login" %}
           </ul>
+          <div class="login-or">or with MarkHub account:</div>
         </div>
         
+        {% include "socialaccount/snippets/login_extra.html" %}
+
         {% else %}
         <p>If you have not created an account yet, then please
         <a href="{{ signup_url }}">sign up</a> first.</p>
         {% endif %}
         
-        <form class="login" method="POST" action="{% url 'account_login' %}">
+        <form class="login my-2" method="POST" action="{% url 'account_login' %}">
           {% csrf_token %}
           {{ form.as_p }}
           {% if redirect_field_value %}
           <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
-          <button class="btn btn-success" type="submit">"Sign In"</button>
+          <p class="text-center">
+            <button class="btn btn-success" type="submit">Sign In</button>
+            <a class="btn btn-outline-secondary" onclick="history.back();">Cancel</a>
+          </p>
         </form>
       
     </div>  
