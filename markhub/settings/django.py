@@ -67,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'markhub.urls'
@@ -172,3 +173,11 @@ ADMIN = [
 ]
 
 SERVER_EMAIL = 'info@markhub.io'
+
+# Content Security Policy
+
+CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net']
+CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'", 'cdn.jsdelivr.net', 'www.googletagmanager.com']
+CSP_IMG_SRC = ["'self'", 'data:', 'https:', 'http:']
+CSP_FONT_SRC = ["'self'", 'cdn.jsdelivr.net']
+CSP_CONNECT_SRC = ["'self'", 'www.google-analytics.com']

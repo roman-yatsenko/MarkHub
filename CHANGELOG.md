@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MathJax preview bug
 
 ### Security
+- add django-csp
 
 ## [0.3.2] - 2022-09-23
 ### Added
