@@ -247,11 +247,13 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
             Http404: if file not found in repository
         """
         try:
-            contents = self.repo.handler.get_contents(path, context['branch'])
+            contents = self.repo.get_contents(path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
             context['html_url'] = contents.html_url
             if context.get('private'):
                 context['published'] = PrivatePublish.lookup_published_file(context)
+            if path and (last_update := self.repo.get_file_last_update(path, context['branch'])):
+                print(last_update)
         except GithubException as e:
             logger.error(f"File not found - {e}")
             raise Http404(

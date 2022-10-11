@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path, PurePosixPath
 from typing import Dict, List, Optional, Union
 
@@ -158,6 +159,20 @@ class GitHubRepository:
         context.update(extra)
         context['history_url'] = 'https://github.com/{username}/{repo}/commits/{branch}/{path}'.format(**context)
         return context
+
+    def get_file_last_update(self, path: str, branch: str) -> Optional[datetime]:
+        """Get file last update in the branch
+
+        Args:
+            path (str): _file path_
+            branch (str): _repo branch_
+
+        Returns:
+            datetime: _file last update_ or None
+        """
+        commits = self.handler.get_commits(sha=branch, path=path)
+        if commits.totalCount:
+            return commits[0].commit.committer.date
 
     def get_path_parts(self, path: str) -> Dict:
         """ Get path parts dict for path
