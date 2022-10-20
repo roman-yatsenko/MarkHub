@@ -76,7 +76,7 @@
   
   {% if last_update %}
   <li class="nav-item ms-1 mt-1">
-    Last updated at {{ last_update|date:"Y/m/d H:i:s O" }}
+    Last updated at <span id="last-update">{{ last_update|date:"Y/m/d H:i:s O" }}</span>
   </li>
   {% endif %}
 
