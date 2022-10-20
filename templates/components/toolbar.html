@@ -49,6 +49,22 @@
     </ul>
   </li>
 
+  <li class="nav-item ms-2">
+    {% if not decode_error and contents and path %}
+      {% include "components/file-actions.html" %}
+    {% elif not disable_branch_selector %}
+    <a class="btn btn-outline-primary" title="Create a new file in this folder"
+      {% if path %}
+      href="{% url 'new-file' repo path %}"
+      {% else %}
+      href="{% url 'new-file' repo %}"
+      {% endif %}>
+      <i class="bi-file-plus"></i> 
+      New file
+    </a>
+  {% endif %}
+  </li>
+
   {% if history_url %}
   <li class="nav-item ms-2">
     <a class="btn btn-outline-dark" href="{{ history_url }}"  title="Commits log" target="_blank">
@@ -57,21 +73,11 @@
     </a> 
   </li>
   {% endif %}
-
-  <li class="nav-item ms-2">
-  {% if not decode_error and contents and path %}
-    {% include "components/file-actions.html" %}
-  {% elif not disable_branch_selector %}
-    <a class="btn btn-outline-primary" title="Create a new file in this folder"
-    {% if path %}
-      href="{% url 'new-file' repo path %}"
-    {% else %}
-      href="{% url 'new-file' repo %}"
-    {% endif %}>
-    <i class="bi-file-plus"></i> 
-    New file
-    </a>
-  {% endif %}
+  
+  {% if last_update %}
+  <li class="nav-item ms-1 mt-1">
+    Last updated at <span id="last-update">{{ last_update|date:"Y/m/d H:i:s O" }}</span>
   </li>
+  {% endif %}
 
 </ul>

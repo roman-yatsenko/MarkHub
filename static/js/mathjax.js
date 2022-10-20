@@ -21,7 +21,6 @@ window.MathJax = {
 let preview = document.getElementById("nav-preview-tab-content");
 
 function previewContentChanged() {
-  console.log('previewContentChanged');
   MathJax.typeset();
   setTimeout(MathJax.typeset, 5000);
 }

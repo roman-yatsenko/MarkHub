@@ -1,5 +1,6 @@
+from datetime import datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
@@ -247,7 +248,7 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
             Http404: if file not found in repository
         """
         try:
-            contents = self.repo.handler.get_contents(path, context['branch'])
+            contents = self.repo.get_contents(path, context['branch'])
             context['contents'] = contents.decoded_content.decode('UTF-8')
             context['html_url'] = contents.html_url
             if context.get('private'):
@@ -264,6 +265,28 @@ class BaseRepoView(LoginRequiredMixin, TemplateView):
             context['contents'] = f"Unicode decode error during openning {self.path}"
             logger.error(context['contents'])
 
+    def _add_file_last_update(self, context: dict, path: str) -> Optional[datetime]:
+        """Add file last update datetime to context
+
+        Args:
+            context (dict): template context
+            path (str): file path in repository
+
+        Raises:
+            Http404: if file not found in repository
+        """
+        try:
+            if path and (last_update := self.repo.get_file_last_update(path, context['branch'])):
+                context['last_update'] = last_update
+        except GithubException as e:
+            logger.error(f"File not found - {e}")
+            raise Http404(
+                "The '{username}/{repo}' repository doesn't contain the '{path}' path in '{branch}'.".format(
+                    **context
+                )
+            )
+        
+
 class RepoView(BaseRepoView):
     """ Repository view """
     template_name = 'repo.html'
@@ -271,6 +294,7 @@ class RepoView(BaseRepoView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for repository view"""
         context = super().get_context_data(**kwargs)
+        context['last_update'] = self.repo.handler.get_commit(self.branch).commit.committer.date
         if not self.path:
             contents = self.repo.handler.get_contents('', self.branch)
             readme_file = sorted([
@@ -306,8 +330,8 @@ class FileView(BaseRepoView):
         """Get context data for file view"""
         context = super().get_context_data(**kwargs)
         self._add_file_contents(context, self.path)
+        self._add_file_last_update(context, self.path)
         return context
-
 
 class ShareView(TemplateView):
     """ Share page view """
