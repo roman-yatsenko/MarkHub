@@ -6,8 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- repo & file last update
-- display last update time with client tz
+- display repo & file last update time with client tz
 
 ### Changed
 
