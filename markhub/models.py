@@ -89,7 +89,7 @@ class PrivatePublish(models.Model):
         content, toc = markdownify(context['content'])
         published_file = PrivatePublish(
             user=context['username'], repo=context['repo'], branch=context['branch'], path=context['path'],
-            content=rendered_content, toc=toc, owner=context['owner']
+            content=content, toc=toc, owner=context['owner']
         )
         published_file.save()
         return published_file

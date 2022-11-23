@@ -6,7 +6,7 @@ from markhub.settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
                               MARTOR_MARKDOWN_EXTENSIONS)
 
 
-def _markdown(self) -> Markdown:
+def _markdown() -> Markdown:
     """
     Rerurn the Markdown object with martor settings
 
@@ -28,5 +28,5 @@ def markdownify(content: str) -> Tuple[str, str]:
     Returns:
         Tuple rendered content and toc:
     """
-    markdown = self._markdown()
+    markdown = _markdown()
     return markdown.convert(content), markdown.toc
