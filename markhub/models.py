@@ -3,6 +3,7 @@ from typing import Optional
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from martor.utils import markdownify
 
 
 class PrivatePublish(models.Model):
@@ -83,9 +84,10 @@ class PrivatePublish(models.Model):
         """
         if published_file := cls.lookup_published_file(context):
             published_file.delete()
+        rendered_content = markdownify(context['content'])
         published_file = PrivatePublish(
             user=context['username'], repo=context['repo'], branch=context['branch'], path=context['path'],
-            content=context['content'], owner=context['owner']
+            content=rendered_content, owner=context['owner']
         )
         published_file.save()
         return published_file
