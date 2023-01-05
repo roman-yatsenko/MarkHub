@@ -7,6 +7,7 @@ from urllib.request import urlopen
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, Http404
 from django.http.request import HttpRequest
@@ -17,6 +18,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 from github import GithubException, UnknownObjectException
+from loguru import logger
 
 from .forms import NewFileForm, UpdateFileForm
 from .models import PrivatePublish
@@ -339,31 +341,33 @@ class ShareView(TemplateView):
     GITHUB_URL_TEMPLATE = 'https://github.com/{username}/{repo}//blob/{branch}/{path}'
 
     def _add_file_content_and_toc(self, context: dict) -> Tuple[str, str]:
-        """Add file content & toc from PrivatePublish or public repository to context
+        """Add file content & toc from PrivatePublish or public repository to context with caching
 
         Args:
             context (dict): context dict with request parameters
         """
-        content = None
+        content = ''
         if shared_file := PrivatePublish.lookup_published_file(context):
             context['contents'] = mark_safe(shared_file.content)
             context['toc'] = mark_safe(shared_file.toc)
             context['private'] = True
         else:
-            try:
-                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
-                content = urlopen(usercontent_url).read().decode('utf-8')
-            except HTTPError:
-                log_error_with_404(f"Url not found - {usercontent_url}")
-            except UnicodeDecodeError:
-                context['decode_error'] = True
-                context['contents'] = f"Unicode decode error during openning {context['path']}"
-                logger.error(context['contents'])
-            finally:
-                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
-            context['contents'], context['toc'] = markdownify(content)
-        context['contents'] = mark_safe(context['contents'])
-        context['toc'] = mark_safe(context['toc'])
+            usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
+            if cache.has_key(usercontent_url):
+                context['contents'], context['toc'] = cache.get(usercontent_url)    
+            else: 
+                try:
+                    content = urlopen(usercontent_url).read().decode('utf-8')
+                except HTTPError:
+                    log_error_with_404(f"Url not found - {usercontent_url}")
+                except UnicodeDecodeError:
+                    context['decode_error'] = True
+                    context['contents'] = f"Unicode decode error during openning {context['path']}"
+                    logger.error(context['contents'])
+                context['contents'], context['toc'] = (mark_safe(x) for x in markdownify(content))
+                if content:
+                    cache.add(usercontent_url, (context['contents'], context['toc']))
+            context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
