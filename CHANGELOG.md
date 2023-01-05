@@ -6,7 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- display repo & file last update time with client tz
 
 ### Changed
 
@@ -17,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [0.3.5] - 2023-01-06
+### Added
+- display repo & file last update time with client tz
+- markdown render caching for public repos
+
+## [0.3.4] - 2022-10-20
+### Added
+- UI improvements (admonitions, last update info)
 
 ## [0.3.3] - 2022-10-07
 ### Added
