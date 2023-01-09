@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% load static %}
-{% load martortags %}
 
 {% block title %}
   {% if user.is_authenticated %}
@@ -16,27 +15,11 @@
 
 {% block content %}
 <div class="container">
-  {% include "components/branch_path_form.html" %}
-  {% if contents %}
-  <div class="mb-3 martor-content border">
-    <div class="martor-preview">
-      {{ contents|safe_markdown }}
-    </div>
-  </div>
-  {% endif %}
+  {% include "components/toolbar.html" %}
+  {% include "components/file-contents.html" %}
   {% if not decode_error %}
   <p>
-    <a class="btn btn-outline-primary" href="{% url 'update-file' repo path %}" title="Edit file">
-      <i class="bi bi-pencil"></i> Edit
-    </a> 
-    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"     
-        title="Delete file">
-        <i class="bi bi-trash"></i> Delete
-    </button> 
-    <a class="btn btn-outline-success" href="{% url 'share' user_name repo branch path %}" target="_blank" 
-        title="Share file">
-      <i class="bi bi-share"></i> Share
-    </a> 
+  {% include "components/file-actions.html" %}
   </p>
   {% endif %}
   <p>

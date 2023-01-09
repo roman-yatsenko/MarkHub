@@ -100,11 +100,14 @@
 
   <footer class="footer p-3 text-center">
     © <a class="text-dark" href="https://github.com/roman-yatsenko/MarkHub" target="_blank">
-        MarkHub</a>, 2021-2022
+        MarkHub</a>, 2021-2023
   </footer>
 
   <script type="text/javascript" src="{% static 'plugins/js/jquery.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'plugins/js/bootstrap.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+  <script type="text/javascript" src="{% static 'js/moment-timezone-with-data-10-year-range.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/client-tz.js' %}"></script>
   {% block js %}{% endblock %}
   
   <!-- Global site tag (gtag.js) - Google Analytics -->

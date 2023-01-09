@@ -19,8 +19,14 @@ window.MathJax = {
 })();
 
 let preview = document.getElementById("nav-preview-tab-content");
+
+function previewContentChanged() {
+  MathJax.typeset();
+  setTimeout(MathJax.typeset, 5000);
+}
+
 if (preview) {
   preview.onclick = () => {
-    setTimeout(MathJax.typeset, 1000);
+    setTimeout(previewContentChanged, 1000);
   }
 }

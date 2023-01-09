@@ -20,7 +20,14 @@
       <a href="{% url 'repo' repo.0 %}" class="list-group-item list-group-item-action" title="Open repository">
         <i class="bi-folder"></i>
         {{ repo.0 }}
-        <br><small>Created at {{ repo.1|date:"SHORT_DATE_FORMAT" }}</small>
+        <span class="badge rounded-pill border bg-light text-dark">
+          {% if repo.2 %}
+          Private
+          {% else %}
+          Public
+          {% endif %}
+        </span>
+        <br><small>Updated at {{ repo.1|date:"SHORT_DATE_FORMAT" }}</small>
       </a>
       {% endfor %}
     </div>

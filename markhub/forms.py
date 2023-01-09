@@ -24,6 +24,7 @@ class UpdateFileForm(forms.Form):
                                    'class': 'form-control',
                                 }))
     content = MartorFormField(label='File content')
+    republish = forms.BooleanField(label='Republish', required=False, initial=False)
 
 
 class BranchSelector(forms.Form):

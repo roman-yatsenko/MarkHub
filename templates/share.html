@@ -4,7 +4,7 @@
 {% load martortags %}
 
 {% block baseurl %}
-  <base href="{% url 'share-base' user repo branch %}">
+  <base href="{% url 'share-base' username repo branch %}">
 {% endblock  %}
 
 
@@ -29,10 +29,12 @@
       <div class="martor-preview border">
         {{ contents }}
       </div>
+      {% if not private %}
       <p class="mt-2">
         <a href="{{ html_url }}" target="_blank" title="Open file in the GitHub">Open in the GitHub</a>
         <i class="bi-box-arrow-up-right"></i>
       </p>
+      {% endif %}
     </div>
   </div>
   {% endif %}

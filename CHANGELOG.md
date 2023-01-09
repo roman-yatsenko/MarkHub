@@ -17,6 +17,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.3.5] - 2023-01-06
+### Added
+- display repo & file last update time with client tz
+- markdown render caching for public repos
+
+## [0.3.4] - 2022-10-20
+### Added
+- UI improvements (admonitions, last update info)
+
+## [0.3.3] - 2022-10-07
+### Added
+- Alt+s shortcut for Update/Create button
+- Filetype icons
+
+### Changed
+- Sign In template
+
+### Fixed
+- MathJax preview bug
+
+### Security
+- add django-csp
+
+## [0.3.2] - 2022-09-23
+### Added
+- sort repos on the homepage by last update
+- history button for repo, repo path and file
+- README.md or index.md rendering at the repo root
+
+### Changed
+- move New file button to the toolbar
+
+## [0.3.1] - 2022-09-13
+### Fixed
+- private share bug for users with full name
+- direct private repo access with no permission
+
+## [0.3.0] - 2022-09-07
+### Added
+- toolbar to new and edit file pages
+- PyMdown SaneHeaders Extension
+- repository type on the Home page
+- PrivatePublish model
+- show private repos if you have private_repos permission
+- repository type on the Home page
+- PrivatePublish model
+- private_repos permission to show private repos
+- add publish_file_ctr and unpublish_file_ctr
+- private files publishing
+- Publish/Unpublish button for shared private files
+- Republish checkbox in the edit page
+- 403 page template
+
+### Changed
+- rename Share button to Publish for private repos
+- refactor file actions in file-actions component
+- Publish button icon
+- refactor controllers with get_repository_or_404 in 
+
+### Fixed
+- error log
+- 500 error for files from private repos without login
+- user and username conflict in context
+
 ## [0.2.2] - 2022-07-27
 ### Added
 - profile menu icon

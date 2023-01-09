@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <h1>403 Access Forbidden</h1>
+  <p>{{ exception }}</p>
+  <button class="btn btn-outline-primary" onclick="history.back();">Go Back</button>
+</div>
+{% endblock %}

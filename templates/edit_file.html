@@ -24,21 +24,35 @@
 
 {% block content %}
 <div class="container">
+  {% include "components/toolbar.html" %}
   <form method="post">
     {% csrf_token %}
-    <div class="mb-3 mt-3">
-      <label for="email" class="form-label">File name:</label>
-      {{ form.filename }}
-    </div>
+      <div
+        {% if update %} 
+        class="mb-3 mt-3 d-none"
+        {% else %}
+        class="mb-3 mt-3"
+        {% endif %}
+      >
+        <label for="email" class="form-label">File name:</label>
+        {{ form.filename }}
+      </div>
+    
     <div class="mb-3">
       {{ form.content }}
     </div>
     <div class="form-group mb-2 d-flex justify-content-end">
+      {% if published %}
+      <div class="me-2 align-self-center">
+        {{ form.republish }}
+        Republish
+      </div>
+      {% endif %}
       {% if update %}
-      <button type="submit" class="btn btn-success" title="Update file">
+      <button type="submit" class="btn btn-success" title="Update file <Alt+s>" accesskey="s">
         <i class="bi bi-check-square"></i> Update
       {% else %}
-      <button type="submit" class="btn btn-success" title="Create file">
+      <button type="submit" class="btn btn-success" title="Create file <Alt+s>" accesskey="s">
         <i class="bi bi-file-plus"></i> Create
       {% endif %}
       </button>
