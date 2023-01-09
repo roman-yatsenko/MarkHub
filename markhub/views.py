@@ -1,12 +1,13 @@
 from datetime import datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, Http404
 from django.http.request import HttpRequest
@@ -17,15 +18,15 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.views.generic import TemplateView
 from github import GithubException, UnknownObjectException
-from markdown import Markdown
+from loguru import logger
 
 from .forms import NewFileForm, UpdateFileForm
 from .models import PrivatePublish
 from .services.bootstrap_icons import FILETYPE_EXTENSIONS
 from .services.github_repository import (GitHubRepository, get_github_handler,
                                          get_repository_or_error)
-from .settings import (MARTOR_MARKDOWN_EXTENSION_CONFIGS,
-                       MARTOR_MARKDOWN_EXTENSIONS, log_error_with_404, logger)
+from .services.markdown_render import markdownify                                         
+from .settings import (log_error_with_404, logger)
 
 
 @login_required
@@ -339,52 +340,38 @@ class ShareView(TemplateView):
     GITHUB_USERCONTENT_TEMPLATE = 'https://raw.githubusercontent.com/{username}/{repo}/{branch}/{path}'
     GITHUB_URL_TEMPLATE = 'https://github.com/{username}/{repo}//blob/{branch}/{path}'
 
-    def _markdown(self) -> Markdown:
-        """
-        Rerurn the Markdown object with martor settings
-
-        Returns:
-            Markdown object
-        """
-        return Markdown(
-            extensions=MARTOR_MARKDOWN_EXTENSIONS,
-            extension_configs=MARTOR_MARKDOWN_EXTENSION_CONFIGS,
-            output_format="html5",
-        )
-    
-    def _shared_file_content(self, context: dict) -> str:
-        """Shared file content from PrivatePublish or public repository
+    def _add_file_content_and_toc(self, context: dict) -> Tuple[str, str]:
+        """Add file content & toc from PrivatePublish or public repository to context with caching
 
         Args:
             context (dict): context dict with request parameters
-
-        Returns:
-            str: shared file content
         """
-        content = None
+        content = ''
         if shared_file := PrivatePublish.lookup_published_file(context):
-            content = shared_file.content
+            context['contents'] = mark_safe(shared_file.content)
+            context['toc'] = mark_safe(shared_file.toc)
             context['private'] = True
         else:
-            try:
-                usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
-                content = urlopen(usercontent_url).read().decode('utf-8')
-            except HTTPError:
-                log_error_with_404(f"Url not found - {usercontent_url}")
-            except UnicodeDecodeError:
-                context['decode_error'] = True
-                context['contents'] = f"Unicode decode error during openning {context['path']}"
-                logger.error(context['contents'])
-            finally:
-                context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
-        return content
+            usercontent_url = ShareView.GITHUB_USERCONTENT_TEMPLATE.format(**context)
+            if cache.has_key(usercontent_url):
+                context['contents'], context['toc'] = cache.get(usercontent_url)    
+            else: 
+                try:
+                    content = urlopen(usercontent_url).read().decode('utf-8')
+                except HTTPError:
+                    log_error_with_404(f"Url not found - {usercontent_url}")
+                except UnicodeDecodeError:
+                    context['decode_error'] = True
+                    context['contents'] = f"Unicode decode error during openning {context['path']}"
+                    logger.error(context['contents'])
+                context['contents'], context['toc'] = (mark_safe(x) for x in markdownify(content))
+                if content:
+                    cache.add(usercontent_url, (context['contents'], context['toc']))
+            context['html_url'] = ShareView.GITHUB_URL_TEMPLATE.format(**context)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """Get context data for share page view"""
         context = super().get_context_data(**kwargs)
         if all(x in context for x in ('username', 'repo', 'branch', 'path')):
-            if content := self._shared_file_content(context):
-                markdown = self._markdown()
-                context['contents'] = mark_safe(markdown.convert(content))
-                context['toc'] = mark_safe(markdown.toc)
+            self._add_file_content_and_toc(context)
         return context

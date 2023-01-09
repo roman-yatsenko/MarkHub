@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
+from .services.markdown_render import markdownify
+
 
 class PrivatePublish(models.Model):
     """Published files from private repos
@@ -18,6 +20,7 @@ class PrivatePublish(models.Model):
     path = models.TextField(max_length=4096, verbose_name='File path')
     published = models.DateTimeField(auto_now_add=True, verbose_name='Publication time')
     content = models.TextField(null=True, blank=True, verbose_name='Markdown content')
+    toc = models.TextField(null=True, blank=True, verbose_name='Markdown content TOC')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User - Repository owner")
 
     class Meta:
@@ -83,9 +86,10 @@ class PrivatePublish(models.Model):
         """
         if published_file := cls.lookup_published_file(context):
             published_file.delete()
+        content, toc = markdownify(context['content'])
         published_file = PrivatePublish(
             user=context['username'], repo=context['repo'], branch=context['branch'], path=context['path'],
-            content=context['content'], owner=context['owner']
+            content=content, toc=toc, owner=context['owner']
         )
         published_file.save()
         return published_file
