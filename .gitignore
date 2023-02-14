@@ -133,3 +133,7 @@ media/
 
 # VS Code files
 .vscode/
+
+# Python extensions files
+.isort.cfg
+.mypy.ini
