@@ -1,10 +1,12 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
 ### Added
 
 ### Changed
@@ -17,45 +19,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## [0.3.5] - 2023-01-06
+## [0.3.6] - 2023-02-15
+
 ### Added
+
+- Markdown hidden content class
+
+## [0.3.5] - 2023-01-06
+
+### Added
+
 - display repo & file last update time with client tz
 - markdown render caching for public repos
 
 ## [0.3.4] - 2022-10-20
+
 ### Added
+
 - UI improvements (admonitions, last update info)
 
 ## [0.3.3] - 2022-10-07
+
 ### Added
+
 - Alt+s shortcut for Update/Create button
 - Filetype icons
 
 ### Changed
+
 - Sign In template
 
 ### Fixed
+
 - MathJax preview bug
 
 ### Security
+
 - add django-csp
 
 ## [0.3.2] - 2022-09-23
+
 ### Added
+
 - sort repos on the homepage by last update
 - history button for repo, repo path and file
 - README.md or index.md rendering at the repo root
 
 ### Changed
+
 - move New file button to the toolbar
 
 ## [0.3.1] - 2022-09-13
+
 ### Fixed
+
 - private share bug for users with full name
 - direct private repo access with no permission
 
 ## [0.3.0] - 2022-09-07
+
 ### Added
+
 - toolbar to new and edit file pages
 - PyMdown SaneHeaders Extension
 - repository type on the Home page
@@ -71,34 +95,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 403 page template
 
 ### Changed
+
 - rename Share button to Publish for private repos
 - refactor file actions in file-actions component
 - Publish button icon
-- refactor controllers with get_repository_or_404 in 
+- refactor controllers with get_repository_or_404 in
 
 ### Fixed
+
 - error log
 - 500 error for files from private repos without login
 - user and username conflict in context
 
 ## [0.2.2] - 2022-07-27
+
 ### Added
+
 - profile menu icon
 - processing repository and anchor links in rendered markdown
 
 ### Changed
+
 - update dependencies
 - enlarge editor font size
 
 ### Security
+
 - add SOCIALACCOUNT_LOGIN_ON_GET=True to django-allauth config
 
 ## [0.2.1] - 2022-07-18
+
 ### Fixed
+
 - baseurl in new/update page
 
 ## [0.2.0] - 2022-07-15
+
 ### Added
+
 - Successful messages for file operations
 - Python-Markdown extensions
 - PyMdown Extensions
@@ -124,6 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - markdown-link-attr-modifier extension
 
 ### Changed
+
 - Home page description
 - Settings stucture
 - Context preparing in class views
@@ -131,18 +166,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Header, footer colors
 
 ### Removed
+
 - Font Awesome
 
 ### Fixed
+
 - Disable non-owner repo access
 - New-file bug
 
 ## [0.1.0] - 2022-03-09
+
 ### Added
-- GitHub authentication with [django-allauth](https://github.com/pennersr/django-allauth) 
+
+- GitHub authentication with [django-allauth](https://github.com/pennersr/django-allauth)
 - Base file and branch repository operations with [PyGithub](https://github.com/PyGithub/PyGithub)
 - markdown editor with preview [Martor](https://github.com/agusmakmun/django-markdown-editor)
 - user interface with [Bootstrap 5](https://getbootstrap.com)
 
-[Unreleased]: https://github.com/roman-yatsenko/MarkHub/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/roman-yatsenko/MarkHub/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/roman-yatsenko/MarkHub/releases/tag/v0.1.0
